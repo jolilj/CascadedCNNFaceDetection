@@ -4,7 +4,7 @@ import time
 import math
 from imagepyramid import ImagePyramid
 from PIL import Image
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 ## Defines a sliding window that is sliding over the image cascade
 # Returns a list [windows, labels, croppedImages] where
@@ -29,13 +29,12 @@ def slideWindow(imagePyramid, stepSize, windowSize):
                     sublabels = []
                     subImages = []
                     windowPositions = []
-                    for y in np.arange(0,image_height-windowSize,30):
-                            for x in np.arange(0,image_width-windowSize,30):
+                    for y in np.arange(0,image_height-windowSize,stepSize):
+                            for x in np.arange(0,image_width-windowSize,stepSize):
                                     windowCenter = [x+int(windowSize/2),y+int(windowSize/2)]
                                     
                                     #Return 
-                                    subImage = [image[x:x+windowSize], image[y:y+windowSize]]
-                                    
+                                    subImage = image[y:y+windowSize,x:x+windowSize]
                                     windowPositions.append(windowCenter)
                                     subImages.append(subImage)
 
@@ -56,11 +55,12 @@ def slideWindow(imagePyramid, stepSize, windowSize):
                                     
                                     #Append to image's sublabels
                                     sublabels.append(sublabel)
-
+				    #title=str(subImage.shape)
                                     #title = ("label:  {0:.2f}").format(sublabel)
                                     #copy = image.copy()
                                     #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [255, 255, 255],1 )
                                     #cv2.imshow(title, copy)
+				    #cv2.imshow('sub',subImage)
                                     #cv2.waitKey(0)
                                     #cv2.destroyAllWindows()
                                     #time.sleep(0.03)
@@ -73,17 +73,17 @@ def slideWindow(imagePyramid, stepSize, windowSize):
 
 ## Test the implementation
 
-pil_img = Image.open('images/2002/07/19/big/img_581.jpg').convert('L')
-img = np.array(pil_img)
+#pil_img = Image.open('images/2002/07/19/big/img_581.jpg').convert('L')
+#img = np.array(pil_img)
 
 
-imagePyramid = ImagePyramid(img, np.asarray([155.093404, 189.450662, 205.0]))
+#imagePyramid = ImagePyramid(img, np.asarray([155.093404, 189.450662, 205.0]))
 
-rect = imagePyramid.pyramid[0].labelToRect()
-cv2.rectangle(imagePyramid.pyramid[0].image, rect[0], rect[1], [0, 255, 0],1 )
+#rect = imagePyramid.pyramid[0].labelToRect()
+#cv2.rectangle(imagePyramid.pyramid[0].image, rect[0], rect[1], [0, 255, 0],1 )
 
-[windows, labels, croppedImages] = slideWindow(imagePyramid, 4, 128)
+#[windows, labels, croppedImages] = slideWindow(imagePyramid, 4, 128)
 
-for i in range(0,len(labels)):
-    print(max(labels[i]))
+#for i in range(0,len(labels)):
+  #  print(max(labels[i]))
 

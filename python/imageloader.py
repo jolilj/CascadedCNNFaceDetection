@@ -3,7 +3,7 @@ import cv2
 import math
 from imagepyramid import ImagePyramid
 from PIL import Image
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
@@ -46,15 +46,15 @@ def getLabel(line):
 	return np.asarray([x_center, y_center, math.fabs(width)])
 
 
-imdb = loadAndPreProcessIms('annotations.txt', 1.5, (32,32))
-pyr = imdb[0]
+#imdb = loadAndPreProcessIms('annotations.txt', 1.5, (32,32))
+#pyr = imdb[0]
 
-rect = pyr.pyramid[1].labelToRect()
-cv2.rectangle(pyr.pyramid[1].image, rect[0], rect[1], [0, 255, 0],1 )
+#rect = pyr.pyramid[1].labelToRect()
+#cv2.rectangle(pyr.pyramid[1].image, rect[0], rect[1], [0, 255, 0],1 )
 
 #plt.imshow(pyr.pyramid[0].image,cmap=plt.cm.gray)
 #plt.show()
 
-print("===================")
-plt.imshow(pyr.pyramid[1].image,cmap=plt.cm.gray)
-plt.show()
+#print("===================")
+#plt.imshow(pyr.pyramid[1].image,cmap=plt.cm.gray)
+#plt.show()
