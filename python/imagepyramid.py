@@ -39,8 +39,6 @@ class ImagePyramid:
             rects.append(i.labelToRect())
         return rects
 
-
-
 class LabeledImage:
     def __init__(self,image, label):
         self.image = image
