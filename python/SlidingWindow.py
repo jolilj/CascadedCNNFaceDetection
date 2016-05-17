@@ -6,39 +6,58 @@ from imagepyramid import ImagePyramid
 from PIL import Image
 import matplotlib.pyplot as plt
 
+#defines a sliding window that is sliding over the image cascade
 
-# So far this is just a nice script without any purpose in life. We should probably turn it into a function. Then it can take the image, label, step size, winLength as arguments and become useful. But now I am going home. If I manage to use this git hub thing. Goodbye python :)
+def slideWindow(imagePyramid, stepSize, windowLength):
+	# labels are stored as [[cx,cy,w], [cx,cy,w]....]
 
-imdb = []
+	subwindows = []
+	windowCenters = []
+	sublabels = []
+	for i in range(0, len(imagePyramid.pyramid)):
+		image = imagePyramid.pyramid[i].image
+		label = imagePyramid.pyramid[i].label
+		image_width = image.shape[1]
+		image_height = image.shape[0]
 
-    
-pil_im = Image.open('/home/c/a/carhei/FaceDetectionRaspberryPi/python/test_im.jpg').convert('L')
-img = np.array(pil_im)
-img = img - np.mean(img)
-img = img/np.std(img)
-imdb.append(img)
-
-#taking windows of the specified size from all images in imdb 
-
-
-for i in range(0, len(imdb)):
-
-	image_width = imdb[i].shape[1]
-	image_height = imdb[i].shape[0]
-
-	stepSize = int(image_width/30)
-	windowLength = int(image_width/5)
-	
-
-	for y in np.arange(0,image_height-windowLength,stepSize):
-		for x in np.arange(0,image_width-windowLength,stepSize):
-			image = imdb[i]
-			window = [x,y, image[x:x+windowLength], image[y:y+windowLength]]
-			copy = image.copy()
-			cv2.rectangle(copy, (x,y), (x+windowLength, y+windowLength), [255, 255, 255],1 )
-			cv2.imshow("Window", copy)
-			cv2.waitKey(1)
-			time.sleep(0.03)
+		
+		for y in np.arange(0,image_height-windowLength,30):
+			for x in np.arange(0,image_width-windowLength,30):
+				windowCenter = [x+int(windowLength/2),y+int(windowLength/2)]
+				subwindow = [image[x:x+windowLength], image[y:y+windowLength]]
+				windowCenters.append(windowCenter)
+				subwindows.append(subwindow)
+				labelwidth = label[2]
+				xlabel_left = label[0]-int(labelwidth/2)
+				xlabel_right = label[0]+int(labelwidth/2)
+				ylabel_upper = label[1]+int(labelwidth/2)
+				ylabel_lower = label[1]-int(labelwidth/2)
+				margin = 2.0/labelwidth
+				sublabelx = 1- margin*(math.fabs(x-xlabel_left)+ math.fabs(x+windowLength-xlabel_right))
+				sublabelx = max(sublabelx, 0)
+				sublabely = 1- margin*(math.fabs(y-ylabel_upper)+ math.fabs(y+windowLength-ylabel_lower))
+				sublabely = max(sublabely, 0)
+				print(margin)
+				sublabels[i].append([sublabelx, sublabely])
+				#copy = image.copy()
+				#cv2.rectangle(copy, (x,y), (x+windowLength, y+windowLength), [255, 255, 255],1 )
+				#cv2.imshow("Window", copy)
+				#cv2.waitKey(1)
+				#time.sleep(0.03)
 
 
+	return [windowCenters, sublabels, subwindow]
 
+## Test the implementation
+
+pil_img = Image.open('images/2002/07/19/big/img_581.jpg').convert('L')
+img = np.array(pil_img)
+
+
+imagePyramid = ImagePyramid(img, np.asarray([155.093404, 189.450662, 205.0]))
+
+rect = imagePyramid.pyramid[0].labelToRect()
+cv2.rectangle(imagePyramid.pyramid[0].image, rect[0], rect[1], [0, 255, 0],1 )
+[windowCenters, sublabels, subwindow] = slideWindow(imagePyramid, 12, 128)
+
+print(sublabels)
