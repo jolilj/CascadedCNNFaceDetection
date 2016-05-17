@@ -28,8 +28,6 @@ class ImagePyramid:
 
             self.pyramid.append(im)
             prevLabel = label
-            print(im.image.shape)
-            print(im.label)
             if (im.image.shape[0] < minSize[1] or im.image.shape[1] < minSize[0]):
                 break
     
@@ -40,8 +38,6 @@ class ImagePyramid:
         for i in self.pyramid:
             rects.append(i.labelToRect())
         return rects
-
-
 
 class LabeledImage:
     def __init__(self,image, label):
