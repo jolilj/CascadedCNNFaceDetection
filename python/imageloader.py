@@ -3,6 +3,11 @@ import cv2
 import math
 from imagepyramid import ImagePyramid
 from PIL import Image
+import imageloader as il
+import slidingwindow as sw
+import numpy as np
+import cv2
+
 #import matplotlib.pyplot as plt
 
 
@@ -26,6 +31,26 @@ def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
                 getNextLine = 0
             prevLine = line
     return imdb
+
+def getCNNFormat(imdb, stepSize, windowSize):
+    X = []
+    Y = []
+    W = []
+    for image in imdb:
+        [windows, labels, croppedImages] = sw.slideWindow(image, stepSize, windowSize)
+        for i in range(0,len(croppedImages)):
+            for j in range(0,len(croppedImages[i])):
+                X.append(croppedImages[i][j])
+                Y.append(labels[i][j])
+                W.append(np.asarray(windows[i][j]))
+
+    X = np.asarray(X)
+    X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
+    Y = np.asarray(Y)
+    Y=Y.reshape(Y.shape[0],1)
+    W = np.asarray(W)
+    W = W.reshape(W.shape[0],1,W.shape[1])
+    return [X,Y,W]
 
 def loadAndNormalize(path):
     pil_im = Image.open('images/' + path + '.jpg').convert('L')

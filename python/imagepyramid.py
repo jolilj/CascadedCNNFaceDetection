@@ -44,5 +44,6 @@ class LabeledImage:
         self.image = image
         self.label = label
 
-    def labelToRect(self):
-        return [(int(self.label[0]-self.label[2]/2),int(self.label[1]-self.label[2]/2)),(int(self.label[0]+self.label[2]/2), int(self.label[1]+self.label[2]/2))]
+    
+def labelToRect(label):
+    return [(int(label[0]-label[2]/2),int(label[1]-label[2]/2)),(int(label[0]+label[2]/2), int(label[1]+label[2]/2))]
