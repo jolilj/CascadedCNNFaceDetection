@@ -39,21 +39,23 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                                     windowPositions.append(windowInfo)
                                     subImages.append(subImage)
 
-                                    #Get image label
-                                    labelwidth = label[2]
-                                    xlabel_left = label[0]-int(labelwidth/2)
-                                    xlabel_right = label[0]+int(labelwidth/2)
-                                    ylabel_upper = label[1]-int(labelwidth/2)
-                                    ylabel_lower = label[1]+int(labelwidth/2)
+                                    #Get image label if available
+                                    if (type(label) != int):
+                                        labelwidth = label[2]
+                                        xlabel_left = label[0]-int(labelwidth/2)
+                                        xlabel_right = label[0]+int(labelwidth/2)
+                                        ylabel_upper = label[1]-int(labelwidth/2)
+                                        ylabel_lower = label[1]+int(labelwidth/2)
 
-                                    #Compare to window and calculate new label
-                                    margin = 1.5/math.pow(labelwidth,2)
-                                    sublabelx = 1- margin*(math.pow(x-xlabel_left,2)+ math.pow(x+windowSize-xlabel_right,2))
-                                    sublabelx = max(sublabelx, 0)
-                                    sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
-                                    sublabely = max(sublabely, 0)
-                                    sublabel = min(sublabelx, sublabely)
-
+                                        #Compare to window and calculate new label
+                                        margin = 1.5/math.pow(labelwidth,2)
+                                        sublabelx = 1- margin*(math.pow(x-xlabel_left,2)+ math.pow(x+windowSize-xlabel_right,2))
+                                        sublabelx = max(sublabelx, 0)
+                                        sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
+                                        sublabely = max(sublabely, 0)
+                                        sublabel = min(sublabelx, sublabely)
+                                    else:
+                                        sublabel = label
                                     #Append to image's sublabels
                                     sublabels.append(sublabel)
 				    #title=str(subImage.shape)
