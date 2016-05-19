@@ -37,6 +37,7 @@ def getCNNFormat(imdb, stepSize, windowSize):
     Y = []
     W = []
     for i in range(0,len(imdb)):
+        print("processing image: {}".format(i+1))
         [windows, labels, croppedImages] = sw.slideWindow(imdb[i], i, stepSize, windowSize)
         for i in range(0,len(croppedImages)):
             for j in range(0,len(croppedImages[i])):

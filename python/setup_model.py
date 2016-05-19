@@ -11,12 +11,12 @@ import os
 
 windowSize = 128
 scaleFactor = 1.5
-stepSize = 16
+stepSize = 32
 modelFileName = 'trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
 
 print("======Loading and Preprocessing...======")
 start_time = time.time()
-imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize,windowSize))
+imdb = il.loadAndPreProcessIms('annotations_train_short.txt', scaleFactor, (windowSize,windowSize))
 
 [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
 print("finished preprocessing in {0}".format(time.time()-start_time))
@@ -33,7 +33,7 @@ else:
     print("No model stored, create new")
 
 print("======Training....======")
-model.fit(X, Y, batch_size=16, nb_epoch=4, verbose=1)
+model.fit(X, Y, batch_size=16, nb_epoch=10, verbose=1)
 print("Finished training!")
 model.save_weights(modelFileName, overwrite=True)
 print("saved model to: " + modelFileName) 
