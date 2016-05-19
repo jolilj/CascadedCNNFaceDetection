@@ -8,9 +8,13 @@ import slidingwindow as sw
 import numpy as np
 import cv2
 
-#import matplotlib.pyplot as plt
+## Load and process a single image from a given path
+def loadAndPreProcessSingle(path, pyramidScale, pyramidMinSize):
+    image = loadAndNormalize(path)
+    return ImagePyramid(image, -1, pyramidScale, pyramidMinSize)
 
-
+# Load and process images given an annotationsfile containing image path and label
+# according to the dataset
 def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
     paths = []
     ellipses = []
@@ -32,6 +36,7 @@ def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
             prevLine = line
     return imdb
 
+# Generate subimages from the sliding window approach and return in format compatible with the CNN.
 def getCNNFormat(imdb, stepSize, windowSize):
     X = []
     Y = []
@@ -53,6 +58,7 @@ def getCNNFormat(imdb, stepSize, windowSize):
     W = W.reshape(W.shape[0],1,W.shape[1])
     return [X,Y,W]
 
+# load an image from file and perform basic pre-processing
 def loadAndNormalize(path):
     pil_im = Image.open('images/' + path + '.jpg').convert('L')
     img = np.array(pil_im)
@@ -60,6 +66,7 @@ def loadAndNormalize(path):
     img = img/np.std(img)
     return img
 
+# generate a square label from the given ellipse data
 def getLabel(line):
 	ellipse = line.split(' ')
 	rmax = float(ellipse[0])
@@ -70,17 +77,3 @@ def getLabel(line):
 	width = int(2*rmax*math.cos(angle*math.pi/180))
 	#ellipsedata.append([(int(x_center), int(y_center)), [int(angle)], (int(rmax), int(rmin))])
 	return np.asarray([x_center, y_center, math.fabs(width)])
-
-
-#imdb = loadAndPreProcessIms('annotations.txt', 1.5, (32,32))
-#pyr = imdb[0]
-
-#rect = pyr.pyramid[1].labelToRect()
-#cv2.rectangle(pyr.pyramid[1].image, rect[0], rect[1], [0, 255, 0],1 )
-
-#plt.imshow(pyr.pyramid[0].image,cmap=plt.cm.gray)
-#plt.show()
-
-#print("===================")
-#plt.imshow(pyr.pyramid[1].image,cmap=plt.cm.gray)
-#plt.show()

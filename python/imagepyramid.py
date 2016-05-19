@@ -6,7 +6,7 @@ import imutils
 
 ## Pyramid representation of an image
 #  labels are stored as [[cx,cy,w], [cx,cy,w]....]
-
+#  label = -1 => no label exists, pass that as argument for test images
 class ImagePyramid:
     # Init with image
     def __init__(self, image, label,  scale=1.5,  minSize=(32,32)):
@@ -21,7 +21,8 @@ class ImagePyramid:
         prevLabel = label
         while True:
             w = int(im.image.shape[1] / scale)
-            label = np.round(prevLabel / scale)
+            if (type(label) != int):
+                label = np.round(prevLabel / scale)
 
             i = imutils.resize(im.image, width=w)
             im = LabeledImage(i, label)

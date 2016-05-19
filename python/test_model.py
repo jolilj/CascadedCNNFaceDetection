@@ -38,6 +38,11 @@ def visualizeResult(pImage, pSubImage, pWindow, tImage, tSubImage, tWindow):
     plt.imshow(true_subimage, cmap=plt.cm.gray)
     plt.show()
 
+#################################################
+#################################################
+############## SCRIPT STARTS ####################
+#################################################
+#################################################
 modelFileName = str(sys.argv[1])
 windowSize = 128
 scaleFactor = 1.5
@@ -45,7 +50,13 @@ stepSize = 16
 
 print("======Loading and Preprocessing...======")
 start_time = time.time()
-imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize,windowSize))
+
+#If path to image passed as argument load and process that image, otherwise load from annotations(evaluation images)
+if (len(sys.argv) > 2):
+        imdb =[il.loadAndPreProcessSingle(str(sys.argv[2]), scaleFactor, (windowSize, windowSize))]
+else:
+    imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize,windowSize))
+
 print("Image database: {0} images".format(len(imdb)))
 [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
 print("finished preprocessing in {0}".format(time.time()-start_time))
