@@ -9,10 +9,10 @@ import time
 import model_architecture
 import os
 
-windowSize = 64
+windowSize = 128
 scaleFactor = 1.5
-stepSize = 8
-modelFileName = 'trained_model_w:' + str(windowSize) + '_scale:' + str(scaleFactor) + '_step:' + str(stepSize) + '.h5'
+stepSize = 16
+modelFileName = 'trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
 
 print("======Loading and Preprocessing...======")
 start_time = time.time()

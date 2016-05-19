@@ -12,7 +12,7 @@ from PIL import Image
 #   * labels[i] are all calculated labels -------------------||-------------------
 #   * croppedImages[i] are the corresponding cropped images
 
-def slideWindow(imagePyramid, stepSize, windowSize):
+def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
 	# labels are stored as [[cx,cy,w], [cx,cy,w]....]
 	croppedImages = []
 	windows = []
@@ -20,6 +20,7 @@ def slideWindow(imagePyramid, stepSize, windowSize):
 
         #loop through all images in pyramid and do a sliding window for each of them
 	for i in range(0, len(imagePyramid.pyramid)):
+                scaleFactor = math.pow(imagePyramid.scale,i)
 		image = imagePyramid.pyramid[i].image
 		label = imagePyramid.pyramid[i].label
 		image_width = image.shape[1]
@@ -31,11 +32,11 @@ def slideWindow(imagePyramid, stepSize, windowSize):
                     windowPositions = []
                     for y in np.arange(0,image_height-windowSize,stepSize):
                             for x in np.arange(0,image_width-windowSize,stepSize):
-                                    windowCenter = [x+int(windowSize/2),y+int(windowSize/2)]
-                                    
-                                    #Return 
                                     subImage = image[y:y+windowSize,x:x+windowSize]
-                                    windowPositions.append(windowCenter)
+
+                                    #Store window position along with it's corresponding image index (for mapping window to image)
+                                    windowInfo = [int((x+windowSize/2)*scaleFactor),int((y+windowSize/2)*scaleFactor), int(windowSize*scaleFactor), imageIdx]
+                                    windowPositions.append(windowInfo)
                                     subImages.append(subImage)
 
                                     #Get image label
@@ -52,7 +53,7 @@ def slideWindow(imagePyramid, stepSize, windowSize):
                                     sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
                                     sublabely = max(sublabely, 0)
                                     sublabel = min(sublabelx, sublabely)
-                                    
+
                                     #Append to image's sublabels
                                     sublabels.append(sublabel)
 				    #title=str(subImage.shape)
