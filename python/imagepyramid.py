@@ -12,7 +12,7 @@ class ImagePyramid:
     def __init__(self, image, label,  scale=1.5,  minSize=(32,32)):
         self.constructPyramid(image, label, scale, minSize)
         self.scale = scale
-
+        self.image = self.pyramid[0].image
     # Construct the image pyramid
     def constructPyramid(self, image, label,  scale, minSize):
         self.pyramid = []

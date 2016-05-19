@@ -6,8 +6,8 @@ import time
 def setUpModel(windowSize):
     model = Sequential()
     model.add(Convolution2D(16, 3, 3, border_mode='valid', input_shape=(1, windowSize, windowSize)))
-    #model.add(MaxPooling2D(pool_size=(3, 3), strides=(2,2)))
-    #model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3), strides=(2,2)))
+    model.add(Activation('relu'))
     model.add(Flatten())
     model.add(Dense(1))
 
