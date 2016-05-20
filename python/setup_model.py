@@ -13,11 +13,11 @@ import sys
 
 
 windowSize = 128
-scaleFactor = 1.5
+scaleFactor = 2
 stepSize = 32
 batchSize = 16
 nbEpoch = 1
-modelFileName = 'trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
+modelFileName = '48_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
 
 # If preprocessed files exists (data path passed as argument) load the raw data
 if (len(sys.argv) > 1):
@@ -45,7 +45,7 @@ print("X-shape: {0}".format(X.shape))
 print("Y-shape: {0}".format(Y.shape))
 
 #Load model architecture
-model = model_architecture.setUp12net(windowSize)
+model = model_architecture.setUp48netCal(windowSize)
 if (os.path.exists(os.getcwd()+'/' + modelFileName)):
     model.load_weights(modelFileName)
     print("Loaded model: " + modelFileName)

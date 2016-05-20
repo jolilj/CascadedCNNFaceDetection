@@ -30,8 +30,10 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                     sublabels = []
                     subImages = []
                     windowPositions = []
-                    for y in np.arange(0,image_height-windowSize,stepSize):
-                            for x in np.arange(0,image_width-windowSize,stepSize):
+                    y_range = image_height-windowSize
+                    x_range = image_width-windowSize
+                    for y in range(0,y_range,stepSize):
+                            for x in range(0,x_range,stepSize):
                                     subImage = image[y:y+windowSize,x:x+windowSize]
 
                                     #Store window position along with it's corresponding image index (for mapping window to image)

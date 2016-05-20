@@ -49,8 +49,10 @@ def getCNNFormat(imdb, stepSize, windowSize):
                 X.append(croppedImages[i][j])
                 Y.append(labels[i][j])
                 W.append(np.asarray(windows[i][j]))
-
     X = np.asarray(X)
+    print("inside il")
+    print(X.shape)
+    print("=====")
     X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
     Y = np.asarray(Y)
     Y=Y.reshape(Y.shape[0],1)
