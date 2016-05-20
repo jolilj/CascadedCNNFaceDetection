@@ -45,7 +45,7 @@ print("X-shape: {0}".format(X.shape))
 print("Y-shape: {0}".format(Y.shape))
 
 #Load model architecture
-model = model_architecture.setUpModel(windowSize)
+model = model_architecture.setUp12net(windowSize)
 if (os.path.exists(os.getcwd()+'/' + modelFileName)):
     model.load_weights(modelFileName)
     print("Loaded model: " + modelFileName)
