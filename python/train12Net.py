@@ -11,11 +11,9 @@ import model_architecture
 import os
 import sys
 
+def train12Net(X, Y, windowSize=24, scaleFactor=2, stepSize=32, batchSize=16, nbEpoch=10):
 
-modelFileName = '12_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
-
-def train12Net(imdb, windowSize=256, scaleFactor=2, stepSize=32, batchSize=16, nbEpoch=10):
-
+    modelFileName = '12_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
     #Load model architecture
     model = model_architecture.setUp12net(windowSize)
     if (os.path.exists(os.getcwd()+'/' + modelFileName)):

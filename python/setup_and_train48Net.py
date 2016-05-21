@@ -3,6 +3,7 @@ from keras.layers import Convolution2D, MaxPooling2D, Activation, Dense, Flatten
 from keras.optimizers import SGD
 from tempfile import TemporaryFile
 import imageloader as il
+from imagepyramid import ImagePyramid
 import slidingwindow as sw
 import numpy as np
 import cv2
@@ -10,15 +11,19 @@ import time
 import model_architecture
 import os
 import sys
+import train48Net as train
+import math
+import preprocess_48net as net
 
-
-windowSize = 128
+prevWindowSize = 24
+minSize = (prevWindowSize*2, prevWindowSize*2)
 scaleFactor = 2
-stepSize = 32
+stepSize = 24
 batchSize = 16
 nbEpoch = 1
-modelFileName = '48_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
+zoomFactor = 5
 
+## Load data for processing and then send into first net
 # If preprocessed files exists (data path passed as argument) load the raw data
 if (len(sys.argv) > 1):
     print("======Loading data from file...======")
@@ -32,9 +37,9 @@ if (len(sys.argv) > 1):
 else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
-    imdb = il.loadAndPreProcessIms('annotations_train_short.txt', scaleFactor, (windowSize,windowSize))
-
-    [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
+    imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (prevWindowSize,prevWindowSize))
+    
+    [X, Y, W] = il.getCNNFormat(imdb, stepSize, prevWindowSize)
     np.save('data/data_X',X)
     np.save('data/data_Y',Y)
     np.save('data/data_W',W)
@@ -44,17 +49,6 @@ else:
 print("X-shape: {0}".format(X.shape))
 print("Y-shape: {0}".format(Y.shape))
 
-#Load model architecture
-model = model_architecture.setUp48netCal(windowSize)
-if (os.path.exists(os.getcwd()+'/' + modelFileName)):
-    model.load_weights(modelFileName)
-    print("Loaded model: " + modelFileName)
+[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize, scaleFactor, zoomFactor)
 
-else:
-    print("No model stored, creating new")
-
-print("======Training....======")
-model.fit(X, Y, batch_size=batchSize, nb_epoch=nbEpoch, verbose=1)
-print("Finished training!")
-model.save_weights(modelFileName, overwrite=True)
-print("saved model to: " + modelFileName) 
+train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)
