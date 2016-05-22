@@ -4,7 +4,16 @@ import matplotlib.pyplot as plt
 import math
 import cv2
 import imageloader as il
-def preProcess48Net(imdb, X,Y,W, prevWindowSize, newWindowSize, scaleFactor, zoomFactor, T=0.5):
+
+newWindowSize = 48
+stepSize = 24
+batchSize = 16
+nbEpoch = 100
+zoomFactor = 5
+pyramidLevels = 3
+
+def preProcess48Net(imdb, X,Y,W, prevWindowSize, T=0):
+    scaleFactor = math.pow(prevWindowSize*zoomFactor*1.0/newWindowSize,1.0/(pyramidLevels-1))
     #Get all indices where the output is higher than the threshold
     idx = np.squeeze(Y>T)
     valid_windows = W[idx,:,:]

@@ -18,17 +18,12 @@ import preprocess_48net as net
 import visualize_results as vr
 
 prevWindowSize = 24
-newWindowSize = 48
 minSize = (prevWindowSize*4, prevWindowSize*4)
 scaleFactor = 2
 stepSize = 24
 batchSize = 16
-nbEpoch = 1
-zoomFactor = 8
-pyramidLevels = 3
-scaleFactor48 = math.pow(prevWindowSize*zoomFactor*1.0/newWindowSize,1.0/(pyramidLevels-1)) 
+nbEpoch = 100
 
-print(scaleFactor)
 ## Load data for processing and then send into first net
 # If preprocessed files exists (data path passed as argument) load the raw data
 if (len(sys.argv) > 1):
@@ -55,18 +50,19 @@ else:
 print("X-shape: {0}".format(X.shape))
 print("Y-shape: {0}".format(Y.shape))
 
-[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize, newWindowSize, scaleFactor48, zoomFactor)
+[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize)
 
-i = np.argmax(Y_48)
-y = Y_48[i,:]
-w = W_48[i,0,:]
-images = []
-for i in range(0,len(W_48)):
-    idx = W_48[i,0,3]
-    images.append(imdb[idx].image)
+train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)
+### To map input to 48 with original image
+#i = np.argmax(Y_48)
+#y = Y_48[i,:]
+#w = W_48[i,0,:]
+#images = []
+#for i in range(0,len(W_48)):
+#    idx = W_48[i,0,3]
+#    images.append(imdb[idx].image)
 
-images = np.squeeze(images)
-X_48 = np.squeeze(X_48)
-W_48 = np.squeeze(W_48)
-vr.visualizeResult(images, X_48, W_48)
-#train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)
+#images = np.squeeze(images)
+#X_48 = np.squeeze(X_48)
+#W_48 = np.squeeze(W_48)
+#vr.visualizeResult(images, X_48, W_48)
