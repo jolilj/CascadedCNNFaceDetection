@@ -3,6 +3,7 @@ import cv2
 import math
 from imagepyramid import ImagePyramid
 from PIL import Image
+import matplotlib.pyplot as plt
 import imageloader as il
 import slidingwindow as sw
 import numpy as np
@@ -68,35 +69,48 @@ def getCNNFormatSingle(imdb, windowSize):
         for i in range(0,len(imagePyramid.pyramid)):
             label = imagePyramid.pyramid[i].label
             image = imagePyramid.pyramid[i].image
-            scaleFactor = math.pow(imagePyramid.scale,i)
-            windowInfo = [int((windowSize/2)*scaleFactor),int((windowSize/2)*scaleFactor), int(windowSize*scaleFactor),k]
-            #Calculate new label
-            #Get image label if available
-            if (type(label) != int):
-                labelwidth = label[2]
-                xlabel_left = label[0]-int(labelwidth/2)
-                xlabel_right = label[0]+int(labelwidth/2)
-                ylabel_upper = label[1]-int(labelwidth/2)
-                ylabel_lower = label[1]+int(labelwidth/2)
+            # Get center of the image
+            x_c = int(image.shape[1]/2)
+            y_c = int(image.shape[0]/2)
+            if (windowSize <= min(image.shape[0], image.shape[1])):
+                y = y_c-windowSize/2
+                x = x_c-windowSize/2
+                subImage = image[y_c-windowSize/2:y_c+windowSize/2,x_c-windowSize/2:x_c+windowSize/2]
+                scaleFactor = math.pow(imagePyramid.scale,i)
+                windowInfo = [int(x_c*scaleFactor),int(y_c*scaleFactor), int(windowSize*scaleFactor),k]
+                #Calculate new label
+                #Get image label if available
+                if (type(label) != int):
+                    labelwidth = label[2]
+                    xlabel_left = label[0]-int(labelwidth/2)
+                    xlabel_right = label[0]+int(labelwidth/2)
+                    ylabel_upper = label[1]-int(labelwidth/2)
+                    ylabel_lower = label[1]+int(labelwidth/2)
+                    
+                    #Compare to window and calculate new label
+                    margin = 1.5/math.pow(labelwidth,2)
+                    sublabelx = 1- margin*(math.pow(x-xlabel_left,2)+ math.pow(x+windowSize-xlabel_right,2))
+                    sublabelx = max(sublabelx, 0.0)
+                    sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
+                    sublabely = max(sublabely, 0.0)
+                    sublabel = min(sublabelx, sublabely)
+                else:
+                    sublabel = label
+                X.append(subImage)
+                Y.append(sublabel)
+                W.append(np.asarray(windowInfo))
                 
-                #Since window is the whole window x = y = 0
-                x = 0
-                y = 0
-                #Compare to window and calculate new label
-                margin = 1.5/math.pow(labelwidth,2)
-                sublabelx = 1- margin*(math.pow(x-xlabel_left,2)+ math.pow(x+windowSize-xlabel_right,2))
-                sublabelx = max(sublabelx, 0.0)
-                sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
-                sublabely = max(sublabely, 0.0)
-                sublabel = min(sublabelx, sublabely)
-            else:
-                sublabel = label
+                title = ("label:  {0:.2f}").format(sublabel)
+                fig = plt.figure(title)
+                fig.add_subplot(1,2,1)
+                copy = image.copy()
+                #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [255, 255, 255],1 )
+                plt.imshow(copy,cmap=plt.cm.gray)
+                fig.add_subplot(1,2,2)
+                plt.imshow(subImage, cmap=plt.cm.gray)
+                plt.show()
 
-            X.append(image)
-            Y.append(sublabel)
-            W.append(np.asarray(windowInfo))
     X = np.asarray(X)
-    print(X.shape)
     X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
     Y = np.asarray(Y)
     Y=Y.reshape(Y.shape[0],1)

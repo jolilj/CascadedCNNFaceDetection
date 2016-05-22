@@ -16,13 +16,16 @@ import math
 import preprocess_48net as net
 
 prevWindowSize = 24
+newWindowSize = 48
 minSize = (prevWindowSize*2, prevWindowSize*2)
-scaleFactor = 2
+scaleFactor = 1.5
 stepSize = 24
 batchSize = 16
 nbEpoch = 1
-zoomFactor = 5
+zoomFactor = 8
+scaleFactor48 = math.pow(prevWindowSize*zoomFactor*1.0/newWindowSize,1.0/3) 
 
+print(scaleFactor)
 ## Load data for processing and then send into first net
 # If preprocessed files exists (data path passed as argument) load the raw data
 if (len(sys.argv) > 1):
@@ -49,6 +52,6 @@ else:
 print("X-shape: {0}".format(X.shape))
 print("Y-shape: {0}".format(Y.shape))
 
-[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize, scaleFactor, zoomFactor)
+[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize, newWindowSize, scaleFactor48, zoomFactor)
 
 train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)

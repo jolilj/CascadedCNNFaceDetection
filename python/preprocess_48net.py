@@ -3,7 +3,7 @@ from imagepyramid import ImagePyramid
 import math
 import cv2
 import imageloader as il
-def preProcess48Net(imdb, X,Y,W, prevWindowSize, scaleFactor, zoomFactor, T=0.5):
+def preProcess48Net(imdb, X,Y,W, prevWindowSize, newWindowSize, scaleFactor, zoomFactor, T=0.5):
     #Get all indices where the output is higher than the threshold
     idx = np.squeeze(Y>T)
     W_48 = W[idx,:,:]
@@ -11,7 +11,6 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, scaleFactor, zoomFactor, T=0.5)
     print("Valid Windows: {0}".format(W_48.shape))
     imdb_48 = []
     wIdx = []
-    windowSize = 0
     if (W_48.shape[0] != 0):
         for i in range(0,W_48.shape[0]):
             window = np.squeeze(W_48[i,:,:])
@@ -31,7 +30,7 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, scaleFactor, zoomFactor, T=0.5)
                 wIdx.append(True)
                 # Crop the image
                 subImage = image[y1:y2,x1:x2]
-                windowSize = prevWindowSize*zoomFactor
+                subImageSize = prevWindowSize*zoomFactor
                 
                 ### OLD ###
                 ##Compare to window and calculate new label
@@ -48,17 +47,11 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, scaleFactor, zoomFactor, T=0.5)
                 #sublabel = min(sublabelx, sublabely)
 
                 #Shift original label to same coordinate system as subimage
-                print("oldlabel: {0}".format(label))
                 scaling = (image.shape[1]/(y2-y1)*1.0)
-                print("x1: {0}, y1: {1}".format(x1,y1))
-                print(scaling)
                 newLabel = np.array(label)
                 newLabel[0] = (label[0] - y1)/scaling
                 newLabel[1] = (label[1] - x1)/scaling
-                print("newlabel: {0}".format(newLabel))
-                print("scaleFactor {0}".format(scaleFactor))
-                pyr = ImagePyramid(subImage, newLabel, scaleFactor, (windowSize/4,windowSize/4))
-                print("Length of pyramid: {0}".format(len(pyr.pyramid)))
+                pyr = ImagePyramid(subImage, newLabel, scaleFactor, (newWindowSize,newWindowSize))
                 imdb_48.append(pyr)
             else:
                 wIdx.append(i)
@@ -66,37 +59,14 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, scaleFactor, zoomFactor, T=0.5)
         # Delete windows for edge images from W_48
         W_48 = W_48[wIdx,:,:]
 
-
-    ### FOR DEBUGGIN, CHECK ALL PYRAMID IMAGES => YES THEY ARE CORRECT, PROBLEM IN SLIDING WINDOW!!! #####
-    for im in imdb_48[0].pyramid:
-        x = im.image
-        title = ("subimage")
-        copy = x.copy()
-        #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [255, 255, 255],1 )
-        cv2.imshow(title, copy)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    
-    print("windowsize: {0}".format(windowSize))
-    print("image: {0}".format(imdb_48[0].image.shape))
-    [X_48, Y_48, W_48] = il.getCNNFormatSingle(imdb_48, windowSize)
-    for i in range(0,X_48.shape[0]):
-        x = np.squeeze(X_48[i,:,:,:])
-        y = np.squeeze(Y_48[i,:])
-        title = ("subimage cnn format")
-        copy = x.copy()
-        #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [255, 255, 255],1 )
-        cv2.imshow(title, copy)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+    print("imdb length: {0}".format(len(imdb_48))) 
+    print("Length of pyramid: {0}".format(len(imdb_48[0].pyramid)))
+    [X_48, Y_48, W_48] = il.getCNNFormatSingle(imdb_48, newWindowSize)
 
     X_48 = np.asarray(X_48)
     Y_48 = np.asarray(Y_48)
-    if (X_48.shape[0] != 0):
-        X_48 = X_48.reshape(X_48.shape[0],1,X_48.shape[1], X_48.shape[2])
-        Y_48 = Y_48.reshape(Y_48.shape[0],1)
     print("X_48-shape: {0}".format(X_48.shape))
     print("Y_48-shape: {0}".format(Y_48.shape))
     print("W_48-shape: {0}".format(W_48.shape))
 
-    return [X_48, Y_48, W_48, windowSize, imdb_48]
+    return [X_48, Y_48, W_48, newWindowSize, imdb_48]
