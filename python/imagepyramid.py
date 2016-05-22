@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 import cv2
 import imutils
-
+import math
 
 ## Pyramid representation of an image
 #  labels are stored as [[cx,cy,w], [cx,cy,w]....]
@@ -20,7 +20,7 @@ class ImagePyramid:
         self.pyramid.append(im)
         prevLabel = label
         while True:
-            w = int(im.image.shape[1] / scale)
+            w = int(math.ceil(im.image.shape[1] / scale))
             if (type(label) != int):
                 label = np.round(prevLabel / scale)
 

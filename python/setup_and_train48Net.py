@@ -17,13 +17,14 @@ import preprocess_48net as net
 
 prevWindowSize = 24
 newWindowSize = 48
-minSize = (prevWindowSize*2, prevWindowSize*2)
-scaleFactor = 1.5
+minSize = (prevWindowSize*4, prevWindowSize*4)
+scaleFactor = 2
 stepSize = 24
 batchSize = 16
 nbEpoch = 1
 zoomFactor = 8
-scaleFactor48 = math.pow(prevWindowSize*zoomFactor*1.0/newWindowSize,1.0/3) 
+pyramidLevels = 3
+scaleFactor48 = math.pow(prevWindowSize*zoomFactor*1.0/newWindowSize,1.0/(pyramidLevels-1)) 
 
 print(scaleFactor)
 ## Load data for processing and then send into first net

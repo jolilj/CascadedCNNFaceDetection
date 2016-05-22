@@ -1,5 +1,6 @@
 import numpy as np
 from imagepyramid import ImagePyramid
+import matplotlib.pyplot as plt
 import math
 import cv2
 import imageloader as il
@@ -13,51 +14,56 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, newWindowSize, scaleFactor, zoo
     wIdx = []
     if (W_48.shape[0] != 0):
         for i in range(0,W_48.shape[0]):
+            #Perturb window a bit
+            #for px in range(-20,30,10):
+                #for py in range(-20,30,10):
             window = np.squeeze(W_48[i,:,:])
             # Get corresponding image to crop new subimages
             image = imdb[window[3]].image
+            # Get the original label
             label = imdb[window[3]].pyramid[0].label
 
-            #Generate new window, replace the old one, ## old => and calculate corresponding label for that window
+            #Generate new bigger window, replace the old one
             W_48[i,:,2] = window[2]*zoomFactor
             y1 = int(window[1]-prevWindowSize*zoomFactor/2)
             y2 = int(window[1]+prevWindowSize*zoomFactor/2)
             x1 = int(window[0]-prevWindowSize*zoomFactor/2)
             x2 = int(window[0]+prevWindowSize*zoomFactor/2)
-
             # Discard edge windows (wrong size...lets hope the face isnt at the edge xD)
             if (not (y1 < 0 or y2 > image.shape[0] or x1 < 0 or x2 > image.shape[1])):
                 wIdx.append(True)
                 # Crop the image
                 subImage = image[y1:y2,x1:x2]
                 subImageSize = prevWindowSize*zoomFactor
-                
-                ### OLD ###
-                ##Compare to window and calculate new label
-                #labelwidth = label[2]
-                #xlabel_left = label[0]-int(labelwidth/2)
-                #xlabel_right = label[0]+int(labelwidth/2)
-                #ylabel_upper = label[1]-int(labelwidth/2)
-                #ylabel_lower = label[1]+int(labelwidth/2)
-                #margin = 1.5/math.pow(labelwidth,2)
-                #sublabelx = 1- margin*(math.pow(x1-xlabel_left,2)+ math.pow(x2-xlabel_right,2))
-                #sublabelx = max(sublabelx, 0)
-                #sublabely = 1- margin*(math.pow(y1-ylabel_upper,2)+ math.pow(y2-ylabel_lower,2))
-                #sublabely = max(sublabely, 0)
-                #sublabel = min(sublabelx, sublabely)
 
                 #Shift original label to same coordinate system as subimage
-                scaling = (image.shape[1]/(y2-y1)*1.0)
-                newLabel = np.array(label)
-                newLabel[0] = (label[0] - y1)/scaling
-                newLabel[1] = (label[1] - x1)/scaling
+                #scaling = (image.shape[1]/(y2-y1)*1.0)
+                print("===Coordinates for window===")
+                print("x1: {0}, y1: {1}, w: {2}".format(x1,y1, subImageSize))
+                x = int(label[0] - label[2]/2)
+                y = int(label[1] - label[2]/2)
+                print("===Coordinates for label===")
+                print("x: {0}, y: {1}, w: {2}".format(x,y, label[2]))
+                newLabel = []
+                newLabel.append(int(x - x1 + label[2]/2))
+                newLabel.append(int(y-y1 + label[2]/2))
+                newLabel.append(label[2])
+                newLabel = np.asarray(newLabel)
+                print("===New label ===")
+                print("x: {0}, y: {1}".format(newLabel[0], newLabel[1]))
                 pyr = ImagePyramid(subImage, newLabel, scaleFactor, (newWindowSize,newWindowSize))
                 imdb_48.append(pyr)
-            else:
-                wIdx.append(i)
-        wIdx = np.asarray(wIdx)
-        # Delete windows for edge images from W_48
-        W_48 = W_48[wIdx,:,:]
+                #title = ("label:  {0:.2f}").format(sublabel)
+                title = "hm"
+                fig = plt.figure(title)
+                fig.add_subplot(1,2,1)
+                copy = image.copy()
+                cv2.rectangle(copy, (int(x),int(y)), (int(x+label[2]), int(y+label[2])), [0, 255, 0],1 )
+                plt.imshow(copy,cmap=plt.cm.gray)
+                fig.add_subplot(1,2,2)
+                plt.imshow(subImage, cmap=plt.cm.gray)
+                plt.show()
+
 
     print("imdb length: {0}".format(len(imdb_48))) 
     print("Length of pyramid: {0}".format(len(imdb_48[0].pyramid)))
