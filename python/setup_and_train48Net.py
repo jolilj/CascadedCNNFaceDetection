@@ -4,6 +4,7 @@ from keras.optimizers import SGD
 from tempfile import TemporaryFile
 import imageloader as il
 from imagepyramid import ImagePyramid
+import matplotlib.pyplot as plt
 import slidingwindow as sw
 import numpy as np
 import cv2
@@ -14,6 +15,7 @@ import sys
 import train48Net as train
 import math
 import preprocess_48net as net
+import visualize_results as vr
 
 prevWindowSize = 24
 newWindowSize = 48
@@ -55,4 +57,16 @@ print("Y-shape: {0}".format(Y.shape))
 
 [X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize, newWindowSize, scaleFactor48, zoomFactor)
 
-train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)
+i = np.argmax(Y_48)
+y = Y_48[i,:]
+w = W_48[i,0,:]
+images = []
+for i in range(0,len(W_48)):
+    idx = W_48[i,0,3]
+    images.append(imdb[idx].image)
+
+images = np.squeeze(images)
+X_48 = np.squeeze(X_48)
+W_48 = np.squeeze(W_48)
+vr.visualizeResult(images, X_48, W_48)
+#train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)

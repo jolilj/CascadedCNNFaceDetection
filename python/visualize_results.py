@@ -11,14 +11,14 @@ import imagepyramid
 #   *tSubImages - true subimages
 #   *tWindows - true windows
 
-def visualizeResult(pImages, pSubImages, pWindows, tImages, tSubImages, tWindows):
+def visualizeResult(pImages, pSubImages, pWindows, tImages=[], tSubImages=[], tWindows=[]):
     for i in range(0,len(pImages)):
         pImage = pImages[i]
         pSubImage = pSubImages[i]
         pWindow = pWindows[i]
 
         predicted_rect = imagepyramid.labelToRect(pWindow)
-        cv2.rectangle(pImage, predicted_rect[1], predicted_rect[0], [0, 255, 0],1 )
+        cv2.rectangle(pImage, predicted_rect[0], predicted_rect[1], [0, 255, 0],1 )
 
         fig = plt.figure()
         fig.add_subplot(2,2,1)

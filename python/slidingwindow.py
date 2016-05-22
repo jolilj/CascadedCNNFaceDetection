@@ -47,10 +47,10 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                                     #Get image label if available
                                     if (type(label) != int):
                                         labelwidth = label[2]
-                                        xlabel_left = label[0]-int(labelwidth/2)
-                                        xlabel_right = label[0]+int(labelwidth/2)
-                                        ylabel_upper = label[1]-int(labelwidth/2)
-                                        ylabel_lower = label[1]+int(labelwidth/2)
+                                        xlabel_left = int(label[0]-labelwidth/2)
+                                        xlabel_right = int(label[0]+labelwidth/2)
+                                        ylabel_upper = int(label[1] - labelwidth/2)
+                                        ylabel_lower = int(label[1]+labelwidth/2)
 
                                         #Compare to window and calculate new label
                                         margin = 1.5/math.pow(labelwidth,2)
@@ -65,10 +65,13 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                                     
                                     #Append to image's sublabels
                                     sublabels.append(sublabel)
-				    #title=str(subImage.shape)
+				    
+                                    
+                                    #title=str(subImage.shape)
                                     #title = ("label:  {0:.2f}").format(sublabel)
                                     #copy = image.copy()
                                     #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [255, 255, 255],1 )
+                                    #cv2.rectangle(copy, (xlabel_left,ylabel_upper), (xlabel_right, ylabel_lower),[255,255,255],1)
                                     #cv2.imshow(title, copy)
 				    #cv2.imshow('sub',subImage)
                                     #cv2.waitKey(0)
