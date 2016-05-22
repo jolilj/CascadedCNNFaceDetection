@@ -14,9 +14,6 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, newWindowSize, scaleFactor, zoo
     wIdx = []
     if (W_48.shape[0] != 0):
         for i in range(0,W_48.shape[0]):
-            #Perturb window a bit
-            #for px in range(-20,30,10):
-                #for py in range(-20,30,10):
             window = np.squeeze(W_48[i,:,:])
             # Get corresponding image to crop new subimages
             image = imdb[window[3]].image
@@ -29,6 +26,7 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, newWindowSize, scaleFactor, zoo
             y2 = int(window[1]+prevWindowSize*zoomFactor/2)
             x1 = int(window[0]-prevWindowSize*zoomFactor/2)
             x2 = int(window[0]+prevWindowSize*zoomFactor/2)
+
             # Discard edge windows (wrong size...lets hope the face isnt at the edge xD)
             if (not (y1 < 0 or y2 > image.shape[0] or x1 < 0 or x2 > image.shape[1])):
                 wIdx.append(True)
@@ -64,6 +62,11 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, newWindowSize, scaleFactor, zoo
                 plt.imshow(subImage, cmap=plt.cm.gray)
                 plt.show()
 
+            else:
+                wIdx.append(i)
+        wIdx = np.asarray(wIdx)
+        # Delete windows for edge images from W_48
+        W_48 = W_48[wIdx,:,:]
 
     print("imdb length: {0}".format(len(imdb_48))) 
     print("Length of pyramid: {0}".format(len(imdb_48[0].pyramid)))
