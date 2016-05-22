@@ -8,6 +8,9 @@ import imageloader as il
 import slidingwindow as sw
 import numpy as np
 import cv2
+import imutils
+
+INITIAL_DOWNSCALE = 2
 
 ## Load and process a single image from a given path
 def loadAndPreProcessSingle(path, pyramidScale, pyramidMinSize):
@@ -58,8 +61,9 @@ def getCNNFormat(imdb, stepSize, windowSize):
     W = W.reshape(W.shape[0],1,W.shape[1])
     return [X,Y,W]
 
-## FIX THIS FUNCTION!!!
-def getCNNFormatSingle(imdb, windowSize):
+# Generate CNN format without sliding window given a set of subimages from an original image
+# references (coordinates etc for windows) are stored in windowPos
+def getCNNFormatSingle(imdb, windowSize, windowPos):
     X = []
     Y = []
     W = []
@@ -80,7 +84,8 @@ def getCNNFormatSingle(imdb, windowSize):
                 #print("x: {0}, y: {1}, w: {2}".format(x,y,windowSize))
                 subImage = image[y_c-windowSize/2:y_c+windowSize/2,x_c-windowSize/2:x_c+windowSize/2]
                 scaleFactor = math.pow(imagePyramid.scale,i)
-                windowInfo = [int(x_c*scaleFactor),int(y_c*scaleFactor), int(windowSize*scaleFactor),k]
+                #Set window info related to original image (shift back to original image coordinate system)
+                windowInfo = [windowPos[k][0] + int(x_c*scaleFactor), windowPos[k][1] +  int(y_c*scaleFactor),int(windowSize*scaleFactor),windowPos[k][2]]
                 #Calculate new label
                 #Get image label if available
                 if (type(label) != int):
@@ -106,15 +111,16 @@ def getCNNFormatSingle(imdb, windowSize):
                 X.append(subImage)
                 Y.append(sublabel)
                 W.append(np.asarray(windowInfo))
-                title = ("label:  {0:.2f}").format(sublabel)
-                fig = plt.figure(title)
-                fig.add_subplot(1,2,1)
-                copy = image.copy()
-                cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [0, 255, 0],1 )
-                plt.imshow(copy,cmap=plt.cm.gray)
-                fig.add_subplot(1,2,2)
-                plt.imshow(subImage, cmap=plt.cm.gray)
-                plt.show()
+                
+                #title = ("label:  {0:.2f}").format(sublabel)
+                #fig = plt.figure(title)
+                #fig.add_subplot(1,2,1)
+                #copy = image.copy()
+                #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [0, 255, 0],1 )
+                #plt.imshow(copy,cmap=plt.cm.gray)
+                #fig.add_subplot(1,2,2)
+                #plt.imshow(subImage, cmap=plt.cm.gray)
+                #plt.show()
 
     X = np.asarray(X)
     X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
@@ -129,6 +135,7 @@ def loadAndNormalize(path):
     img = np.array(pil_im)
     img = img - np.mean(img)
     img = img/np.std(img)
+    img = imutils.resize(img, int(math.ceil(img.shape[1]/INITIAL_DOWNSCALE)))
     return img
 
 # generate a square label from the given ellipse data
@@ -141,4 +148,4 @@ def getLabel(line):
 	y_center = float(ellipse[4])
 	width = int(2*rmax*math.cos(angle*math.pi/180))
 	#ellipsedata.append([(int(x_center), int(y_center)), [int(angle)], (int(rmax), int(rmin))])
-	return np.asarray([x_center, y_center, math.fabs(width)])
+	return np.asarray([x_center, y_center, math.fabs(width)])/INITIAL_DOWNSCALE

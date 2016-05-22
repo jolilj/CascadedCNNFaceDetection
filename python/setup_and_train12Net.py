@@ -13,12 +13,11 @@ import sys
 import train12Net as train
 
 windowSize = 24
-scaleFactor = 2
+scaleFactor = 1.5
 stepSize = 24
 batchSize = 16
-nbEpoch = 10
+nbEpoch = 100
 modelFileName = '12_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
-
 # If preprocessed files exists (data path passed as argument) load the raw data
 if (len(sys.argv) > 1):
     print("======Loading data from file...======")
@@ -32,7 +31,7 @@ if (len(sys.argv) > 1):
 else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
-    imdb = il.loadAndPreProcessIms('annotations_train_short.txt', scaleFactor, (windowSize,windowSize))
+    imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize*4,windowSize*4))
 
     [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
     np.save('data/data_X',X)
