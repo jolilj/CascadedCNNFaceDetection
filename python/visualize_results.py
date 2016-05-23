@@ -49,6 +49,6 @@ def visualizeResultNoSubImage(title, pImages, pWindows):
         predicted_rect = imagepyramid.labelToRect(pWindow)
         cv2.rectangle(pImage, predicted_rect[0], predicted_rect[1], [0, 0, 0],1 )
 
-        plt.imshow(pImage,cmap=plt.cm.gray)
-        plt.show()
+    plt.imshow(pImage,cmap=plt.cm.gray)
+    plt.show()
 

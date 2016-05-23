@@ -87,11 +87,15 @@ print("preprocessing in {0}".format(time.time()-start_time))
 predictions_48 = model48.predict_on_batch(X_48)
 print("prediction in {0} s".format(time.time()-start_time))
 print("Number of predictions: {0}".format(predictions_48.shape))
+print(predictions_48)
 ## To map input to 48 with original image
 i = np.argmax(np.squeeze(predictions_48))
 y = Y_48[i,:]
 w = W_48[i,0,:]
+#windows = []
+#windows.append(w)
 images = []
+#images.append(imdb[w[3]].image)
 for i in range(0,len(W_48)):
     idx = W_48[i,0,3]
     images.append(imdb[idx].image)
