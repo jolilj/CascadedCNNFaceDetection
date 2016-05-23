@@ -2,6 +2,7 @@ from keras.models import Sequential
 import model_architecture
 import time
 import imageloader as il
+import math
 import sys
 import imagepyramid
 from PIL import Image
@@ -14,6 +15,7 @@ import visualize_results as vr
 model12FileName = str(sys.argv[1])
 model48FileName = str(sys.argv[2])
 windowSize = 24
+windowSize48 = 48
 scaleFactor = 2
 stepSize = 24
 T12 = 0.3 #threshold for it is passed to 48net
@@ -52,10 +54,26 @@ model12 = model_architecture.setUp12net(windowSize)
 print("Loading model from: " + model12FileName)
 model12.load_weights(model12FileName)
 
+model48 = model_architecture.setUp48net(windowSize48)
+print("Loading model from: " + model48FileName)
+model12.load_weights(model12FileName)
+
 # Get best predictions
 predictions_12 = model12.predict(X, batch_size=16, verbose=1)
-print("12Net max prediction: {0}".format(np.max(predictions_12)))
-print("12Net max label: {0}".format(np.max(Y)))
+# Get top 10%
+targets  = np.squeeze(predictions_12)
+nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
+p_idx = np.argsort(targets)[-nb_top_targets:]
+Y = Y[p_idx,:]
+predictions_12 = predictions_12[p_idx,:]
+X = X[p_idx,:, :, :]
+W = W[p_idx, :, :]
+print('X-shape')
+print(X.shape)
+print('Y-shape: ')
+print(Y.shape)
+print('W-shape')
+print(W.shape)
 print("=========================================")
 
 #================================================
@@ -64,63 +82,22 @@ print("=========================================")
 
 print("\n\n============== 48Net ====================")
 prevWindowSize = windowSize
-scaleFactor = 2
-batchSize = 1
-zoomFactor = 3
+[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12,W, prevWindowSize, 0.5)
+print("preprocessing in {0}".format(time.time()-start_time))
+predictions_48 = model48.predict_on_batch(X_48)
+print("prediction in {0} s".format(time.time()-start_time))
+## To map input to 48 with original image
+i = np.argmax(np.squeeze(predictions_48))
+y = Y_48[i,:]
+w = W_48[i,0,:]
+images = []
+for i in range(0,len(W_48)):
+    idx = W_48[i,0,3]
+    images.append(imdb[idx].image)
 
-[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12,W, prevWindowSize, scaleFactor, zoomFactor, T12)
+images = np.squeeze(images)
+X_48 = np.squeeze(X_48)
+W_48 = np.squeeze(W_48)
 
-### To map input to 48 with original image
-#i = np.argmax(Y_48)
-#y = Y_48[i,:]
-#w = W_48[i,0,:]
-#images = []
-#for i in range(0,len(W_48)):
-#    idx = W_48[i,0,3]
-#    images.append(imdb[idx].image)
-
-#images = np.squeeze(images)
-#X_48 = np.squeeze(X_48)
-#W_48 = np.squeeze(W_48)
-#vr.visualizeResult(images, X_48, W_48)
-# Check if there are any face candidates at all from 12 net
-if (X_48.shape[0]!= 0):
-    model48 = model_architecture.setUp48net(windowSize)
-    print("Loading model from: " + model48FileName)
-    model48.load_weights(model48FileName)
-
-    predictions_48 = model48.predict(X_48, batchSize, verbose=1)
-
-    #================================================
-    # Evaluation
-    #================================================
-
-    p_idx = np.reshape(0,1,np.asarray(predictions_48 > T48))
-    t_idx = np.reshape(0,1,np.asarray(Y_48 > T48))
-    print("\n========== Top predictions vs true ===========")
-    print("Predicted max labels:\n{0}\nTrue labels:\n {1}".format(predictions_48[p_idx], Y_48[p_idx]))
-    print("========== Top true vs predictions ===========")
-    print("Max true labels:\n{1}\n predicted labels:\n {0}".format(predictions_48[p_idx], Y_48[p_idx]))
-    print("==============================================")
-    predicted_windows = W_48[p_idx,:,:]
-    predicted_windows = predicted_windows.reshape(predicted_windows.shape[1],predicted_windows.shape[2])
-    true_windows = W_48[t_idx,:,:]
-    true_windows = true_windows.reshape(true_windows.shape[1],true_windows.shape[2])
-    predicted_images = []
-    true_images = []
-    for i in range(0,len(predicted_windows)):
-        predicted_images.append(imdb[predicted_windows[i][3]].image)
-        true_images.append(np.copy(predicted_images[i]))
-    predicted_images = np.asarray(predicted_images)
-    true_images = np.asarray(true_images)
-
-    predicted_subimages = X_48[p_idx,:,:]
-    predicted_subimages = predicted_subimages.reshape(predicted_subimages.shape[1], predicted_subimages.shape[2], predicted_subimages.shape[3])
-
-    true_subimages = X_48[t_idx,:,:]
-    true_subimages = true_subimages.reshape(true_subimages.shape[1], true_subimages.shape[2], true_subimages.shape[3])
-
-    vr.visualizeResult(predicted_images, predicted_subimages, predicted_windows, true_images, true_subimages, true_windows)
-else:
-    print("NO FACE!!!")
-print("=========================================")
+title = "Top predicted face image from 48Net"
+vr.visualizeResultNoSubImage(title,images, W_48)
