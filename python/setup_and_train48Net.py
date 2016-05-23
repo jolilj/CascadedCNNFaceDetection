@@ -22,7 +22,7 @@ minSize = (prevWindowSize*4, prevWindowSize*4)
 scaleFactor = 2
 stepSize = 24
 batchSize = 16
-nbEpoch = 100
+nbEpoch = 30
 
 ## Load data for processing and then send into first net
 # If preprocessed files exists (data path passed as argument) load the raw data
@@ -38,7 +38,7 @@ if (len(sys.argv) > 1):
 else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
-    imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (prevWindowSize,prevWindowSize))
+    imdb = il.loadAndPreProcessIms('annotations_train.txt', scaleFactor, (prevWindowSize,prevWindowSize))
     
     [X, Y, W] = il.getCNNFormat(imdb, stepSize, prevWindowSize)
     np.save('data/data_X',X)
