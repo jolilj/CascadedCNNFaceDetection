@@ -40,21 +40,22 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, T=0):
                 # Crop the image
                 subImage = image[y1:y2,x1:x2]
                 subImageSize = prevWindowSize*zoomFactor
-
-                #Shift original label to same coordinate system as subimage
-                #print("===Coordinates for window===")
-                #print("x1: {0}, y1: {1}, w: {2}".format(x1,y1, subImageSize))
-                x = int(label[0] - label[2]/2)
-                y = int(label[1] - label[2]/2)
-                #print("===Coordinates for label===")
-                #print("x: {0}, y: {1}, w: {2}".format(x,y, label[2]))
-                newLabel = []
-                newLabel.append(int(x - x1 + label[2]/2))
-                newLabel.append(int(y-y1 + label[2]/2))
-                newLabel.append(label[2])
-                newLabel = np.asarray(newLabel)
-                #print("===New label ===")
-                #print("x: {0}, y: {1}".format(newLabel[0], newLabel[1]))
+                newLabel = label
+                if (type(label) != int):
+                    #Shift original label to same coordinate system as subimage
+                    #print("===Coordinates for window===")
+                    #print("x1: {0}, y1: {1}, w: {2}".format(x1,y1, subImageSize))
+                    x = int(label[0] - label[2]/2)
+                    y = int(label[1] - label[2]/2)
+                    #print("===Coordinates for label===")
+                    #print("x: {0}, y: {1}, w: {2}".format(x,y, label[2]))
+                    newLabel = []
+                    newLabel.append(int(x - x1 + label[2]/2))
+                    newLabel.append(int(y-y1 + label[2]/2))
+                    newLabel.append(label[2])
+                    newLabel = np.asarray(newLabel)
+                    #print("===New label ===")
+                    #print("x: {0}, y: {1}".format(newLabel[0], newLabel[1]))
                 pyr = ImagePyramid(subImage, newLabel, scaleFactor, (newWindowSize,newWindowSize))
                 imdb_48.append(pyr)
                 #title = ("label:  {0:.2f}").format(sublabel)

@@ -64,8 +64,8 @@ predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 targets  = np.squeeze(predictions_12)
 nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
 p_idx = np.argsort(targets)[-nb_top_targets:]
-Y = Y[p_idx,:]
 predictions_12 = predictions_12[p_idx,:]
+Y = Y[p_idx,:]
 X = X[p_idx,:, :, :]
 W = W[p_idx, :, :]
 print('X-shape')
@@ -82,10 +82,11 @@ print("=========================================")
 
 print("\n\n============== 48Net ====================")
 prevWindowSize = windowSize
-[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12,W, prevWindowSize, 0.5)
+[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12,W, prevWindowSize)
 print("preprocessing in {0}".format(time.time()-start_time))
 predictions_48 = model48.predict_on_batch(X_48)
 print("prediction in {0} s".format(time.time()-start_time))
+print("Number of predictions: {0}".format(predictions_48.shape))
 ## To map input to 48 with original image
 i = np.argmax(np.squeeze(predictions_48))
 y = Y_48[i,:]
