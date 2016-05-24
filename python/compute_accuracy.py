@@ -35,7 +35,7 @@ def compute_accuracy(predictions_48, imdb, W_48):
 
 def compute_accuracy_dataset(maxlabels, imdb, W_48):
 	acc = []
-	for k in range(shape.maxlabels[0]):
+	for k in range(maxlabels.shape[0]):
 		i = int(maxlabels[k][1])
 		idx = W_48[i,3]
 		predicted_label = W_48[i,:]
