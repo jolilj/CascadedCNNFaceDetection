@@ -49,7 +49,7 @@ def loadAndPreProcessNegative(path, N,  pyramidScale, pyramidMinSize):
     imdb = []
     for i in rand_idx:
         # Put an annotation window outside of the image to ensure a label=0
-        label = np.asarray([-1000, -1000, 10])
+        label = np.asarray([-10000, -10000, 100])
         tempIm = loadAndNormalize(im_paths[i])
         imdb.append(ImagePyramid(tempIm,label, pyramidScale, pyramidMinSize))
     return imdb
@@ -67,7 +67,6 @@ def getCNNFormat(imdb, stepSize, windowSize):
                 Y.append(labels[i][j])
                 W.append(np.asarray(windows[i][j]))
     X = np.asarray(X)
-    print(X.shape)
     X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
     Y = np.asarray(Y)
     Y=Y.reshape(Y.shape[0],1)

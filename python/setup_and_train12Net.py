@@ -5,6 +5,7 @@ from tempfile import TemporaryFile
 import imageloader as il
 import slidingwindow as sw
 import numpy as np
+import random
 import cv2
 import time
 import model_architecture
@@ -15,8 +16,8 @@ import train12Net as train
 windowSize = 24
 scaleFactor = 1.5
 stepSize = 24
-batchSize = 16
-nbEpoch = 100
+batchSize = 128
+nbEpoch = 10
 modelFileName = '12_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
 # If preprocessed files exists (data path passed as argument) load the raw data
 if (len(sys.argv) > 1):
@@ -32,7 +33,9 @@ else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
     imdb = il.loadAndPreProcessIms('annotations_train.txt', scaleFactor, (windowSize*4,windowSize*4))
-
+    imdb2 = il.loadAndPreProcessNegative('images/sun2',500,2, (windowSize*4, windowSize*4))
+    imdb = imdb + imdb2
+    random.shuffle(imdb)
     [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
     np.save('data/data_X',X)
     np.save('data/data_Y',Y)

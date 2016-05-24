@@ -25,8 +25,6 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
 		label = imagePyramid.pyramid[i].label
 		image_width = image.shape[1]
 		image_height = image.shape[0]
-                print(image.shape)
-                print(windowSize)
                 if (windowSize <= min(image_width, image_height)):
                     sublabels = []
                     subImages = []
@@ -52,7 +50,6 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                                         xlabel_right = int(label[0]+labelwidth/2)
                                         ylabel_upper = int(label[1] - labelwidth/2)
                                         ylabel_lower = int(label[1]+labelwidth/2)
-                                        print(label)
 
                                         #Compare to window and calculate new label
                                         margin = 1.5/math.pow(labelwidth,2)
