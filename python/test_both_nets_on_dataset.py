@@ -67,18 +67,58 @@ predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 #targets  = np.squeeze(predictions_12)
 #nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
 #p_idx = np.argsort(targets)[-nb_top_targets:]
+
+#print('===========P===========')
+#print(p_idx)
 #predictions_12 = predictions_12[p_idx,:]
 #Y = Y[p_idx,:]
 #X = X[p_idx,:, :, :]
 #W = W[p_idx, :, :]
 
-targets  = np.squeeze(predictions_12)
-nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
-high_idx = np.argsort(targets)[-nb_top_targets:]
-low_idx = np.argsort(targets)[0:nb_top_targets]
 
-predictions_high = predictions_12[high_idx,:]
-predictions_low = predictions_12[low_idx,:]
+
+#predictions_high = predictions_12[high_idx,:]
+#predictions_low = predictions_12[low_idx,:]
+
+X_high = []
+W_high = []
+X_per_image = []
+W_per_image = []
+pred_per_image = []
+predictions_high = []
+previmageidx = W[0][0][3]
+X_per_image = np.asarray(X_per_image)
+pred_per_image = np.asarray(pred_per_image)
+W_per_image = np.asarray(W_per_image)
+
+
+for i in range(0, predictions_12.shape[0]):
+	imageidx = W[i][0][3]
+	if(imageidx == previmageidx):
+		pred_per_image = np.append(pred_per_image, predictions_12[i, :])
+		X_per_image = np.append(X_per_image, X[i,:,:, :])
+		W_per_image = np.append(W_per_image, W[i,:,:])
+	else:
+		print(X_per_image.shape)
+		nb_top_targets = int(math.ceil(len(pred_per_image)*0.1))
+		high_idx = np.argsort(pred_per_image)[-nb_top_targets:]
+		X_high = np.concatenate((X_high, X_per_image[high_idx, :, :, :]), axis=0)
+		W_high = np.concatenate((W_high, W_per_image[high_idx, :, :]), axis = 0)
+		predictions_high = np.concatenate((predictions_high + pred_per_image[high_idx, : ]), axis = 0)
+		pred_per_image = []
+		X_per_image = []
+		W_per_image = []
+		previmageidx = imageidx	
+
+
+
+
+	
+	#else:	
+	#	predictions_high = pred_image[high_idx,:]
+	#	pred_image = []
+	#previmageidx = imageidx
+
 
 
 ##================================================
@@ -111,12 +151,12 @@ for i in range(0, W_48.shape[0]):
 	else:	
 		maxlabels.append([maxlabel,maxindex])
 		maxlabel = 0
-		previmageidx = imageidx
+	previmageidx = imageidx
 maxlabels.append([maxlabel,maxindex])
 
 
-
-
+maxlabels = np.asarray(maxlabels)
+print(maxlabels.shape)
 #===========================
 # Evaluation for a data set
 #===========================
@@ -125,7 +165,7 @@ W_48 = np.squeeze(W_48)
 windows = []
 images = []
 
-for i in range(shape.maxlabels[0]):
+for i in range(maxlabels.shape[0]):
 	maxindex = int(maxlabels[i][1])
 	imageidx = W_48[maxindex,3]
 	windows.append(W_48[maxindex,:])
@@ -133,9 +173,10 @@ for i in range(shape.maxlabels[0]):
 	
 
 windows = np.asarray(windows)
-windows = np.squeeze(windows)
+#windows = np.squeeze(windows)
 
 acc = acc.compute_accuracy_dataset(maxlabels, imdb, W_48)
+
 
 
 title = "Top predicted face image from 48Net"
