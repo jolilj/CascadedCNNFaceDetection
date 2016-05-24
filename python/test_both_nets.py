@@ -18,7 +18,7 @@ windowSize = 24
 windowSize48 = 48
 scaleFactor = 2
 stepSize = 24
-T12 = 0.3 #threshold for it is passed to 48net
+T12 = 0.2 #threshold for it is passed to 48net
 T48 = 0.3 #threshold for if it is a high label for the final evaluation
 
 #================================================
@@ -62,7 +62,7 @@ model48.load_weights(model48FileName)
 predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 # Get top 10%
 targets  = np.squeeze(predictions_12)
-nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
+nb_top_targets = int(math.ceil(targets.shape[0]*0.2))
 p_idx = np.argsort(targets)[-nb_top_targets:]
 predictions_12 = predictions_12[p_idx,:]
 Y = Y[p_idx,:]
@@ -75,7 +75,7 @@ print(Y.shape)
 print('W-shape')
 print(W.shape)
 print("=========================================")
-
+print(predictions_12)
 #================================================
 # 48 net
 #================================================
