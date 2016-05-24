@@ -72,13 +72,14 @@ predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 #X = X[p_idx,:, :, :]
 #W = W[p_idx, :, :]
 
-print('X-shape')
-print(X.shape)
-print('Y-shape: ')
-print(Y.shape)
-print('W-shape')
-print(W.shape)
-print("=========================================")
+targets  = np.squeeze(predictions_12)
+nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
+high_idx = np.argsort(targets)[-nb_top_targets:]
+low_idx = np.argsort(targets)[0:nb_top_targets]
+
+predictions_high = predictions_12[high_idx,:]
+predictions_low = predictions_12[low_idx,:]
+
 
 ##================================================
 # 48 net
@@ -95,7 +96,7 @@ print("prediction in {0} s".format(time.time()-start_time))
 #================================================
 ## To map input to 48 with original image
 maxlabels = []
-previmageidx = -1
+previmageidx = W_48[0][0][3]
 maxlabel = -1
 label = -1
 maxindex = -1
@@ -113,7 +114,6 @@ for i in range(0, W_48.shape[0]):
 		previmageidx = imageidx
 maxlabels.append([maxlabel,maxindex])
 
-maxlabels = (maxlabels[1:])
 
 
 
@@ -125,7 +125,7 @@ W_48 = np.squeeze(W_48)
 windows = []
 images = []
 
-for i in range(len(imdb)):
+for i in range(shape.maxlabels[0]):
 	maxindex = int(maxlabels[i][1])
 	imageidx = W_48[maxindex,3]
 	windows.append(W_48[maxindex,:])
@@ -137,7 +137,7 @@ windows = np.squeeze(windows)
 
 acc = acc.compute_accuracy_dataset(maxlabels, imdb, W_48)
 
-print(acc)
+
 title = "Top predicted face image from 48Net"
 vr.visualizeResultNoSubImage(title,images, windows)
 
