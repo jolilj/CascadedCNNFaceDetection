@@ -31,7 +31,7 @@ if (len(sys.argv) > 1):
 else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
-    imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize*4,windowSize*4))
+    imdb = il.loadAndPreProcessIms('annotations_train.txt', scaleFactor, (windowSize*4,windowSize*4))
 
     [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
     np.save('data/data_X',X)
@@ -43,5 +43,8 @@ else:
 print("X-shape: {0}".format(X.shape))
 print("Y-shape: {0}".format(Y.shape))
 
-train.train12Net(X,Y, windowSize, scaleFactor, stepSize, batchSize, nbEpoch)
+history = train.train12Net(X,Y, windowSize, scaleFactor, stepSize, batchSize, nbEpoch)
+f = open('12net_training_log', 'w')
+for loss in history.history.get('loss'):
+    f.write(str(loss) + ',')
 

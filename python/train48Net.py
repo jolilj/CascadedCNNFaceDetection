@@ -13,9 +13,9 @@ import sys
 
 
 
-def train48Net(X,Y,W, windowSize=64, batchSize=16, nbEpoch=10):
+def train48Net(X,Y,W, windowSize=48, batchSize=16, nbEpoch=10):
     #Load model architecture
-    modelFileName = '48_trained_model_w' + str(windowSize) + '.h5'
+    modelFileName = '48_trained_model_w' + str(windowSize) + '_batch' + str(batchSize) +'.h5'
     model = model_architecture.setUp48net(windowSize)
     if (os.path.exists(os.getcwd()+'/' + modelFileName)):
         model.load_weights(modelFileName)
@@ -25,7 +25,8 @@ def train48Net(X,Y,W, windowSize=64, batchSize=16, nbEpoch=10):
         print("No model stored, creating new")
 
     print("======Training....======")
-    model.fit(X, Y, batch_size=batchSize, nb_epoch=nbEpoch, verbose=1)
+    history = model.fit(X, Y, batch_size=batchSize, nb_epoch=nbEpoch, verbose=1)
     print("Finished training!")
     model.save_weights(modelFileName, overwrite=True)
     print("saved model to: " + modelFileName) 
+    return history

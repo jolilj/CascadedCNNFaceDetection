@@ -19,9 +19,9 @@ import visualize_results as vr
 
 prevWindowSize = 24
 minSize = (prevWindowSize*4, prevWindowSize*4)
-scaleFactor = 2
+scaleFactor = 1.5
 stepSize = 24
-batchSize = 16
+batchSize = 32
 nbEpoch = 30
 
 ## Load data for processing and then send into first net
@@ -52,7 +52,12 @@ print("Y-shape: {0}".format(Y.shape))
 
 [X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X,Y,W,prevWindowSize)
 
-train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)
+history = train.train48Net(X_48,Y_48,W_48, windowSize,  batchSize, nbEpoch)
+#print(history.history.get('loss'))
+f = open('48net_training_log', 'w')
+for loss in history.history.get('loss'):
+    f.write(str(loss) + ',')
+
 ### To map input to 48 with original image
 #i = np.argmax(Y_48)
 #y = Y_48[i,:]

@@ -24,7 +24,8 @@ def train12Net(X, Y, windowSize=24, scaleFactor=2, stepSize=32, batchSize=16, nb
         print("No model stored, creating new")
 
     print("======Training....======")
-    model.fit(X, Y, batch_size=batchSize, nb_epoch=nbEpoch, verbose=1)
+    history = model.fit(X, Y, batch_size=batchSize, nb_epoch=nbEpoch, verbose=1)
     print("Finished training!")
     model.save_weights(modelFileName, overwrite=True)
     print("saved model to: " + modelFileName) 
+    return history
