@@ -35,7 +35,7 @@ start_time = time.time()
 if (len(sys.argv) > 3):
         imdb =[il.loadAndPreProcessSingle(str(sys.argv[3]), scaleFactor, (windowSize, windowSize))]
 else:
-    imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize,windowSize))
+    imdb = il.loadAndPreProcessIms('annotations_test_short.txt', scaleFactor, (windowSize,windowSize))
 
 print("Image database: {0} images".format(len(imdb)))
 [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
@@ -64,61 +64,48 @@ model48.load_weights(model48FileName)
 # Get best predictions
 predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 # Get top 10%
-#targets  = np.squeeze(predictions_12)
-#nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
-#p_idx = np.argsort(targets)[-nb_top_targets:]
+targets  = np.squeeze(predictions_12)
+nb_top_targets = int(math.ceil(targets.shape[0]*0.1))
+p_idx = np.argsort(targets)[-nb_top_targets:]
 
-#print('===========P===========')
-#print(p_idx)
-#predictions_12 = predictions_12[p_idx,:]
-#Y = Y[p_idx,:]
-#X = X[p_idx,:, :, :]
-#W = W[p_idx, :, :]
+ #==================Pick out high indices=============
 
-
-
-#predictions_high = predictions_12[high_idx,:]
-#predictions_low = predictions_12[low_idx,:]
-
-X_high = []
-W_high = []
+predictions_high = []
+previmageidx = W[0][0][3]
 X_per_image = []
 W_per_image = []
 pred_per_image = []
-predictions_high = []
-previmageidx = W[0][0][3]
-X_per_image = np.asarray(X_per_image)
-pred_per_image = np.asarray(pred_per_image)
-W_per_image = np.asarray(W_per_image)
+X_high = []
+W_high = []
 
 
 for i in range(0, predictions_12.shape[0]):
 	imageidx = W[i][0][3]
 	if(imageidx == previmageidx):
-		pred_per_image = np.append(pred_per_image, predictions_12[i, :])
-		X_per_image = np.append(X_per_image, X[i,:,:, :])
-		W_per_image = np.append(W_per_image, W[i,:,:])
+		pred_per_image.append(predictions_12[i, :])
+		X_per_image.append(X[i, :, :, :])
+		W_per_image.append(W[i, :, :])
+		
 	else:
-		print(X_per_image.shape)
 		nb_top_targets = int(math.ceil(len(pred_per_image)*0.1))
-		high_idx = np.argsort(pred_per_image)[-nb_top_targets:]
-		X_high = np.concatenate((X_high, X_per_image[high_idx, :, :, :]), axis=0)
-		W_high = np.concatenate((W_high, W_per_image[high_idx, :, :]), axis = 0)
-		predictions_high = np.concatenate((predictions_high + pred_per_image[high_idx, : ]), axis = 0)
-		pred_per_image = []
+		high_idx = np.argsort(np.squeeze(pred_per_image))[-nb_top_targets:]
+		print("Number: {0}".format(nb_top_targets))
+		for index in high_idx:
+			X_high.append(X_per_image[index][:][:][:])
+			W_high.append(W_per_image[index][:][:])
+			predictions_high.append(pred_per_image[index][:])
 		X_per_image = []
 		W_per_image = []
-		previmageidx = imageidx	
+		pred_per_image = []
+	previmageidx = imageidx
 
 
+X_high = np.asarray(X_high)
+W_high = np.asarray(W_high)
+predictions_high = np.asarray(predictions_high)
 
-
-	
-	#else:	
-	#	predictions_high = pred_image[high_idx,:]
-	#	pred_image = []
-	#previmageidx = imageidx
-
+for i in range(len(predictions_high)):
+	print(predictions_high[i][:])
 
 
 ##================================================
@@ -127,7 +114,8 @@ for i in range(0, predictions_12.shape[0]):
 
 print("\n\n============== 48Net ====================")
 start_time = time.time()
-[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12, W, windowSize12, T12)
+[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X_high, predictions_high, W_high, windowSize12, T12)
+#[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12, W, windowSize12, T12)
 print("preprocessing in {0}".format(time.time()-start_time))
 predictions_48 = model48.predict_on_batch(X_48)
 print("prediction in {0} s".format(time.time()-start_time))
@@ -156,7 +144,6 @@ maxlabels.append([maxlabel,maxindex])
 
 
 maxlabels = np.asarray(maxlabels)
-print(maxlabels.shape)
 #===========================
 # Evaluation for a data set
 #===========================
