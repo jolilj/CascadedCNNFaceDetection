@@ -56,7 +56,7 @@ model12.load_weights(model12FileName)
 
 model48 = model_architecture.setUp48net(windowSize48)
 print("Loading model from: " + model48FileName)
-model12.load_weights(model12FileName)
+model48.load_weights(model48FileName)
 
 # Get best predictions
 predictions_12 = model12.predict(X, batch_size=16, verbose=1)
@@ -90,19 +90,12 @@ print("Number of predictions: {0}".format(predictions_48.shape))
 print(predictions_48)
 ## To map input to 48 with original image
 i = np.argmax(np.squeeze(predictions_48))
-y = Y_48[i,:]
+y = predictions_48[i,0]
 w = W_48[i,0,:]
-#windows = []
-#windows.append(w)
+windows = []
+windows.append(w)
 images = []
-#images.append(imdb[w[3]].image)
-for i in range(0,len(W_48)):
-    idx = W_48[i,0,3]
-    images.append(imdb[idx].image)
+images.append(imdb[w[3]].image)
 
-images = np.squeeze(images)
-X_48 = np.squeeze(X_48)
-W_48 = np.squeeze(W_48)
-
-title = "Top predicted face image from 48Net"
-vr.visualizeResultNoSubImage(title,images, W_48)
+title = "Top predicted face image from 48Net: {0:.3f}".format(y.item())
+vr.visualizeResultNoSubImage(title,images, windows)

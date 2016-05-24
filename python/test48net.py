@@ -12,8 +12,7 @@ import cv2
 import preprocess_48net as net
 import visualize_results as vr
 
-model12FileName = str(sys.argv[1])
-model48FileName = str(sys.argv[2])
+model48FileName = str(sys.argv[1])
 windowSize48 = 48
 windowSize12 = 24
 stepSize = 24
@@ -28,8 +27,8 @@ print("======Loading and Preprocessing...======")
 start_time = time.time()
 
 #If path to image passed as argument load and process that image, otherwise load from annotations(evaluation images)
-if (len(sys.argv) > 3):
-        imdb =[il.loadAndPreProcessSingle(str(sys.argv[3]), scaleFactor, (windowSize12*4, windowSize12*4))]
+if (len(sys.argv) > 2):
+        imdb =[il.loadAndPreProcessSingle(str(sys.argv[2]), scaleFactor, (windowSize12*4, windowSize12*4))]
 else:
     imdb = il.loadAndPreProcessIms('annotations_short.txt', scaleFactor, (windowSize12*4,windowSize12*4))
 
@@ -71,17 +70,12 @@ print("prediction in {0} s".format(time.time()-start_time))
 #================================================
 ## To map input to 48 with original image
 i = np.argmax(predictions_48)
-y = predictions_48[i,:]
+y = predictions_48[i,0]
 w = W_48[i,0,:]
 images = []
-for i in range(0,len(W_48)):
-    idx = W_48[i,0,3]
-    images.append(imdb[idx].image)
-
-images = np.squeeze(images)
-X_48 = np.squeeze(X_48)
-W_48 = np.squeeze(W_48)
-
-title = "Top predicted face image from 48Net"
-vr.visualizeResultNoSubImage(title,images, W_48)
+images.append(imdb[w[3]].image)
+windows = []
+windows.append(w)
+title = "Top predicted face image from 48Net: {0:.3f}".format(y.item())
+vr.visualizeResultNoSubImage(title,images, windows)
 print("=========================================")

@@ -1,3 +1,5 @@
+import random
+import glob
 import numpy as np
 import cv2
 import math
@@ -14,7 +16,7 @@ INITIAL_DOWNSCALE = 2
 
 ## Load and process a single image from a given path
 def loadAndPreProcessSingle(path, pyramidScale, pyramidMinSize):
-    image = loadAndNormalize(path)
+    image = loadAndNormalize(path + 'jpg')
     return ImagePyramid(image, -1, pyramidScale, pyramidMinSize)
 
 # Load and process images given an annotationsfile containing image path and label
@@ -31,7 +33,7 @@ def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
             line = line.strip()
             if(len(line)==1 and int(line)==1):
                 #Load image, normalize and make zero mean
-                tempIm = loadAndNormalize(prevLine)
+                tempIm = loadAndNormalize('images/' + prevLine + '.jpg')
                 getNextLine = 1
             elif(getNextLine):
                 label = getLabel(line)
@@ -40,6 +42,17 @@ def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
             prevLine = line
     return imdb
 
+def loadAndPreProcessNegative(path, N,  pyramidScale, pyramidMinSize):
+    im_paths = glob.glob(path + '/*.jpg')
+    print(len(im_paths))
+    rand_idx = random.sample(range(0, len(im_paths)), N)
+    imdb = []
+    for i in rand_idx:
+        # Put an annotation window outside of the image to ensure a label=0
+        label = np.asarray([-1000, -1000, 10])
+        tempIm = loadAndNormalize(im_paths[i])
+        imdb.append(ImagePyramid(tempIm,label, pyramidScale, pyramidMinSize))
+    return imdb
 # Generate subimages from the sliding window approach and return in format compatible with the CNN.
 def getCNNFormat(imdb, stepSize, windowSize):
     X = []
@@ -54,6 +67,7 @@ def getCNNFormat(imdb, stepSize, windowSize):
                 Y.append(labels[i][j])
                 W.append(np.asarray(windows[i][j]))
     X = np.asarray(X)
+    print(X.shape)
     X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
     Y = np.asarray(Y)
     Y=Y.reshape(Y.shape[0],1)
@@ -131,7 +145,7 @@ def getCNNFormatSingle(imdb, windowSize, windowPos):
     return [X,Y,W]
 # load an image from file and perform basic pre-processing
 def loadAndNormalize(path):
-    pil_im = Image.open('images/' + path + '.jpg').convert('L')
+    pil_im = Image.open(path).convert('L')
     img = np.array(pil_im)
     img = img - np.mean(img)
     img = img/np.std(img)
