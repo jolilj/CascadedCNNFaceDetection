@@ -20,7 +20,7 @@ windowSize = 24
 windowSize48 = 48
 windowSize12 = 24
 scaleFactor = 1.5
-stepSize = 12
+stepSize = 24
 T12 = 0 #threshold for it is passed to 48net
 T48 = 0 #threshold for if it is a high label for the final evaluation
 
@@ -40,12 +40,6 @@ else:
 print("Image database: {0} images".format(len(imdb)))
 [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
 print("finished preprocessing in {0}".format(time.time()-start_time))
-print('X-shape')
-print(X.shape)
-print('Y-shape: ')
-print(Y.shape)
-print('W-shape')
-print(W.shape)
 
 print("=========================================")
 #================================================
@@ -62,6 +56,8 @@ print("Loading model from: " + model48FileName)
 model48.load_weights(model48FileName)
 
 # Get best predictions
+start_time = time.time()
+
 predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 # Get top 10%
 targets  = np.squeeze(predictions_12)
@@ -103,8 +99,6 @@ X_high = np.asarray(X_high)
 W_high = np.asarray(W_high)
 predictions_high = np.asarray(predictions_high)
 
-for i in range(len(predictions_high)):
-	print(predictions_high[i][:])
 
 
 ##================================================
@@ -112,7 +106,7 @@ for i in range(len(predictions_high)):
 #================================================
 
 print("\n\n============== 48Net ====================")
-start_time = time.time()
+
 [X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X_high, predictions_high, W_high, windowSize12, T12)
 #[X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12, W, windowSize12, T12)
 print("preprocessing in {0}".format(time.time()-start_time))
@@ -162,7 +156,7 @@ windows = np.asarray(windows)
 #windows = np.squeeze(windows)
 
 acc = acc.compute_accuracy_dataset(maxlabels, imdb, W_48)
-print(acc)
+
 thres_acc = 0
 tracked = 0
 
@@ -172,7 +166,12 @@ for a in acc:
 
 prec = float(tracked)/float(len(acc))
 
-print(prec)
+
+
+f = open('accuracies', 'w')
+for a in acc:
+    f.write(str(a) + ',')
+
 
 title = "Top predicted face image from 48Net"
 vr.visualizeResultNoSubImage(title,images, windows)

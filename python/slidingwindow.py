@@ -66,16 +66,6 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                                     sublabels.append(sublabel)
 				    
                                     
-                                    #title=str(subImage.shape)
-                                    #title = ("label:  {0:.2f}").format(sublabel)
-                                    #copy = image.copy()
-                                    #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [255, 255, 255],1 )
-                                    #cv2.rectangle(copy, (xlabel_left,ylabel_upper), (xlabel_right, ylabel_lower),[255,255,255],1)
-                                    #cv2.imshow(title, copy)
-				    #cv2.imshow('sub',subImage)
-                                    #cv2.waitKey(0)
-                                    #cv2.destroyAllWindows()
-                                    #time.sleep(0.03)
 
                     #Append image's sublabels to the new labels
                     labels.append(sublabels)
@@ -83,19 +73,4 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                     windows.append(windowPositions)
         return [windows, labels, croppedImages]
 
-## Test the implementation
-
-#pil_img = Image.open('images/2002/07/19/big/img_581.jpg').convert('L')
-#img = np.array(pil_img)
-
-
-#imagePyramid = ImagePyramid(img, np.asarray([155.093404, 189.450662, 205.0]))
-
-#rect = imagePyramid.pyramid[0].labelToRect()
-#cv2.rectangle(imagePyramid.pyramid[0].image, rect[0], rect[1], [0, 255, 0],1 )
-
-#[windows, labels, croppedImages] = slideWindow(imagePyramid, 4, 128)
-
-#for i in range(0,len(labels)):
-  #  print(max(labels[i]))
 
