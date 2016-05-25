@@ -19,8 +19,8 @@ model48FileName = str(sys.argv[2])
 windowSize = 24
 windowSize48 = 48
 windowSize12 = 24
-scaleFactor = 2
-stepSize = 24
+scaleFactor = 1.5
+stepSize = 12
 T12 = 0 #threshold for it is passed to 48net
 T48 = 0 #threshold for if it is a high label for the final evaluation
 
