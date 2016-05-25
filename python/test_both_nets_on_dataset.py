@@ -174,6 +174,11 @@ prec = float(tracked)/float(len(acc))
 
 print(prec)
 
+f = open('accuracies', 'w')
+for a in acc:
+    f.write(str(a) + ',')
+
+
 title = "Top predicted face image from 48Net"
 vr.visualizeResultNoSubImage(title,images, windows)
 

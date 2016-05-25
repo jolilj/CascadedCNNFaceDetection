@@ -44,10 +44,11 @@ def visualizeResult(title,pImages, pSubImages, pWindows, tImages=[], tSubImages=
 def visualizeResultNoSubImage(title, pImages, pWindows):
     for i in range(0,len(pImages)):
         pImage = pImages[i]
+	color = np.max(pImage)
         pWindow = pWindows[i]
 
         predicted_rect = imagepyramid.labelToRect(pWindow)
-        cv2.rectangle(pImage, predicted_rect[0], predicted_rect[1], [0, 0, 0],1 )
+        cv2.rectangle(pImage, predicted_rect[0], predicted_rect[1], [color, color, color],1 )
         plt.figure(title)
         plt.imshow(pImage,cmap=plt.cm.gray)
         plt.show() 
