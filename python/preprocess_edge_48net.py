@@ -30,8 +30,8 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, T=0):
             y2 = int(window[1]+prevWindowSize*zoomFactor/2)
             x1 = int(window[0]-prevWindowSize*zoomFactor/2)
             x2 = int(window[0]+prevWindowSize*zoomFactor/2)
-            print("========================================") 
-            print("x1: {0}, x2: {1}, y1: {2}, y2: {3}".format(x1,x2,y1,y2))
+            #print("========================================") 
+            #print("x1: {0}, x2: {1}, y1: {2}, y2: {3}".format(x1,x2,y1,y2))
             #Shift y position if outside image
             if (y1 < 0):
                 y1 = 0
@@ -47,8 +47,8 @@ def preProcess48Net(imdb, X,Y,W, prevWindowSize, T=0):
             elif (x2 > image.shape[1]):
                 x2 = image.shape[1]
                 x1 = x1 - x2
-            print("x1: {0}, x2: {1}, y1: {2}, y2: {3}".format(x1,x2,y1,y2))
-            print("========================================") 
+            #print("x1: {0}, x2: {1}, y1: {2}, y2: {3}".format(x1,x2,y1,y2))
+            #print("========================================") 
             # Discard edge windows (wrong size...lets hope the face isnt at the edge xD)
             if (not (y1 < 0 or y2 > image.shape[0] or x1 < 0 or x2 > image.shape[1])):
                 windowPos.append([x1,y1, window[3]])

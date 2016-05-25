@@ -15,7 +15,7 @@ import train12Net as train
 
 windowSize = 24
 scaleFactor = 1.5
-stepSize = 24
+stepSize = 12
 batchSize = 128
 nbEpoch = 10
 modelFileName = '12_trained_model_w' + str(windowSize) + '_scale' + str(scaleFactor) + '_step' + str(stepSize) + '.h5'
@@ -33,9 +33,10 @@ else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
     imdb = il.loadAndPreProcessIms('annotations_train.txt', scaleFactor, (windowSize*4,windowSize*4))
-    imdb2 = il.loadAndPreProcessNegative('images/sun2',500,2, (windowSize*4, windowSize*4))
+    imdb2 = il.loadAndPreProcessNegative('images/sun2',300,2, (windowSize*4, windowSize*4))
     imdb = imdb + imdb2
     random.shuffle(imdb)
+    print("getting cnn format")
     [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
     np.save('data/data_X',X)
     np.save('data/data_Y',Y)
