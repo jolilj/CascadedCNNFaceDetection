@@ -17,7 +17,7 @@ model48FileName = str(sys.argv[2])
 windowSize = 24
 windowSize48 = 48
 scaleFactor = 1.5
-stepSize = 12
+stepSize = 24
 T12 = 0.2 #threshold for it is passed to 48net
 T48 = 0.3 #threshold for if it is a high label for the final evaluation
 
@@ -37,12 +37,6 @@ else:
 print("Image database: {0} images".format(len(imdb)))
 [X, Y, W] = il.getCNNFormat(imdb, stepSize, windowSize)
 print("finished preprocessing in {0}".format(time.time()-start_time))
-print('X-shape')
-print(X.shape)
-print('Y-shape: ')
-print(Y.shape)
-print('W-shape')
-print(W.shape)
 
 print("=========================================")
 #================================================
@@ -59,6 +53,8 @@ print("Loading model from: " + model48FileName)
 model48.load_weights(model48FileName)
 
 # Get best predictions
+
+start_time = time.time()
 predictions_12 = model12.predict(X, batch_size=16, verbose=1)
 # Get top 10%
 targets  = np.squeeze(predictions_12)
@@ -68,32 +64,19 @@ predictions_12 = predictions_12[p_idx,:]
 Y = Y[p_idx,:]
 X = X[p_idx,:, :, :]
 W = W[p_idx, :, :]
-print('X_top-shape')
-print(X.shape)
-print('Y_top-shape: ')
-print(Y.shape)
-print('W_top-shape')
-print(W.shape)
-print("=========================================")
+
 #print(predictions_12)
 #================================================
 # 48 net
 #================================================
-
 print("\n\n============== 48Net ====================")
 prevWindowSize = windowSize
 [X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X, predictions_12,W, prevWindowSize)
-print("preprocessing in {0}".format(time.time()-start_time))
+#print("preprocessing in {0}".format(time.time()-start_time))
 predictions_48 = model48.predict_on_batch(X_48)
 print("prediction in {0} s".format(time.time()-start_time))
-print("Number of predictions: {0}".format(predictions_48.shape))
 
-print('X_48-shape')
-print(X_48.shape)
-print('Y_top-shape: ')
-print(Y_48.shape)
-print('W_48-shape')
-print(W_48.shape)
+
 
 #print(predictions_48)
 ## To map input to 48 with original image
