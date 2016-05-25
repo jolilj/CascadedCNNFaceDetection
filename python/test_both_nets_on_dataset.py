@@ -89,7 +89,6 @@ for i in range(0, predictions_12.shape[0]):
 	else:
 		nb_top_targets = int(math.ceil(len(pred_per_image)*0.1))
 		high_idx = np.argsort(np.squeeze(pred_per_image))[-nb_top_targets:]
-		print("Number: {0}".format(nb_top_targets))
 		for index in high_idx:
 			X_high.append(X_per_image[index][:][:][:])
 			W_high.append(W_per_image[index][:][:])
@@ -163,11 +162,20 @@ windows = np.asarray(windows)
 #windows = np.squeeze(windows)
 
 acc = acc.compute_accuracy_dataset(maxlabels, imdb, W_48)
+print(acc)
+thres_acc = 0
+tracked = 0
 
+for a in acc:
+	if a>thres_acc:
+		tracked = tracked+1
 
+prec = float(tracked)/float(len(acc))
 
-title = "Top predicted face image from 48Net"
-vr.visualizeResultNoSubImage(title,images, windows)
+print(prec)
+
+#title = "Top predicted face image from 48Net"
+#vr.visualizeResultNoSubImage(title,images, windows)
 
 
 

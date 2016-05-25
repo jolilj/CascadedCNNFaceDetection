@@ -44,7 +44,6 @@ def loadAndPreProcessIms(annotationsFile, pyramidScale, pyramidMinSize):
 
 def loadAndPreProcessNegative(path, N,  pyramidScale, pyramidMinSize):
     im_paths = glob.glob(path + '/*.jpg')
-    print(len(im_paths))
     rand_idx = random.sample(range(0, len(im_paths)), N)
     imdb = []
     for i in rand_idx:
@@ -59,7 +58,7 @@ def getCNNFormat(imdb, stepSize, windowSize):
     Y = []
     W = []
     for k in range(0,len(imdb)):
-        print("processing image: {}".format(k+1))
+        #print("processing image: {}".format(k+1))
         [windows, labels, croppedImages] = sw.slideWindow(imdb[k], k, stepSize, windowSize)
         for i in range(0,len(croppedImages)):
             for j in range(0,len(croppedImages[i])):
@@ -81,7 +80,7 @@ def getCNNFormatSingle(imdb, windowSize, windowPos):
     Y = []
     W = []
     for k in range(0,len(imdb)):
-        print("processing image, no sliding: {}".format(k+1))
+        #print("processing image, no sliding: {}".format(k+1))
         imagePyramid = imdb[k]
         for i in range(0,len(imagePyramid.pyramid)):
             label = imagePyramid.pyramid[i].label

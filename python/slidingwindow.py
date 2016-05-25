@@ -52,7 +52,7 @@ def slideWindow(imagePyramid, imageIdx, stepSize, windowSize):
                                         ylabel_lower = int(label[1]+labelwidth/2)
 
                                         #Compare to window and calculate new label
-                                        margin = 1.5/math.pow(labelwidth,2)
+                                        margin = 2/math.pow(labelwidth,2)
                                         sublabelx = 1- margin*(math.pow(x-xlabel_left,2)+ math.pow(x+windowSize-xlabel_right,2))
                                         sublabelx = max(sublabelx, 0.0)
                                         sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
