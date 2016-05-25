@@ -14,6 +14,9 @@ import imutils
 
 INITIAL_DOWNSCALE = 2
 
+# Preprocessing functions for images before giving them as input to the 24-net
+
+
 ## Load and process a single image from a given path
 def loadAndPreProcessSingle(path, pyramidScale, pyramidMinSize):
     image = loadAndNormalize(path + 'jpg')
@@ -58,7 +61,6 @@ def getCNNFormat(imdb, stepSize, windowSize):
     Y = []
     W = []
     for k in range(0,len(imdb)):
-        #print("processing image: {}".format(k+1))
         [windows, labels, croppedImages] = sw.slideWindow(imdb[k], k, stepSize, windowSize)
         for i in range(0,len(croppedImages)):
             for j in range(0,len(croppedImages[i])):
@@ -88,12 +90,9 @@ def getCNNFormatSingle(imdb, windowSize, windowPos):
             # Get center of the image
             x_c = int(image.shape[1]/2)
             y_c = int(image.shape[0]/2)
-            #print("Image: {0}".format(image.shape))
             if (windowSize <= min(image.shape[0], image.shape[1])):
                 y = y_c-windowSize/2
                 x = x_c-windowSize/2
-                #print("Window coordinates")
-                #print("x: {0}, y: {1}, w: {2}".format(x,y,windowSize))
                 subImage = image[y_c-windowSize/2:y_c+windowSize/2,x_c-windowSize/2:x_c+windowSize/2]
                 scaleFactor = math.pow(imagePyramid.scale,i)
                 #Set window info related to original image (shift back to original image coordinate system)
@@ -107,15 +106,11 @@ def getCNNFormatSingle(imdb, windowSize, windowPos):
                     ylabel_upper = label[1]-int(labelwidth/2)
                     ylabel_lower = label[1]+int(labelwidth/2)
                     
-                    #print("Label coordinates")
-                    #print("x: {0}, y: {1}, w: {2}".format(xlabel_left,ylabel_upper,labelwidth))
                     #Compare to window and calculate new label
                     margin = 2/math.pow(labelwidth,2)
                     sublabelx = 1- margin*(math.pow(x-xlabel_left,2)+ math.pow(x+windowSize-xlabel_right,2))
-                    #print("x_dist: {0}".format(sublabelx))
                     sublabelx = max(sublabelx, 0.0)
                     sublabely = 1- margin*(math.pow(y-ylabel_upper,2)+ math.pow(y+windowSize-ylabel_lower,2))
-                    #print("y_dist: {0}".format(sublabely))
                     sublabely = max(sublabely, 0.0)
                     sublabel = min(sublabelx, sublabely)
                 else:
@@ -123,16 +118,6 @@ def getCNNFormatSingle(imdb, windowSize, windowPos):
                 X.append(subImage)
                 Y.append(sublabel)
                 W.append(np.asarray(windowInfo))
-                
-                #title = ("label:  {0:.2f}").format(sublabel)
-                #fig = plt.figure(title)
-                #fig.add_subplot(1,2,1)
-                #copy = image.copy()
-                #cv2.rectangle(copy, (x,y), (x+windowSize, y+windowSize), [0, 255, 0],1 )
-                #plt.imshow(copy,cmap=plt.cm.gray)
-                #fig.add_subplot(1,2,2)
-                #plt.imshow(subImage, cmap=plt.cm.gray)
-                #plt.show()
 
     X = np.asarray(X)
     X = X.reshape(X.shape[0],1,X.shape[1], X.shape[2])
@@ -159,5 +144,4 @@ def getLabel(line):
 	x_center = float(ellipse[3])
 	y_center = float(ellipse[4])
 	width = int(2*rmax*math.cos(angle*math.pi/180))
-	#ellipsedata.append([(int(x_center), int(y_center)), [int(angle)], (int(rmax), int(rmin))])
 	return np.asarray([x_center, y_center, math.fabs(width)])/INITIAL_DOWNSCALE

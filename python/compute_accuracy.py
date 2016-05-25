@@ -1,6 +1,7 @@
 import numpy as np
 import math
 
+#computes the accuracy based on predictions and ground truth
 
 def compute_accuracy(predictions_48, imdb, W_48):
 	i = np.argmax(np.squeeze(predictions_48))
@@ -26,9 +27,6 @@ def compute_accuracy(predictions_48, imdb, W_48):
 	accy = 1- margin*(math.pow(pylabel_upper-tylabel_upper,2)+ math.pow(pylabel_lower-tylabel_lower,2))
 	accx = max(accx, 0.0)
 	accy = max(accy, 0.0)
-
-	#errorx = math.pow(pxlabel_left-txlabel_left,2)+ math.pow(pxlabel_right-txlabel_right,2)
-	#errory = math.pow(pylabel_upper-tylabel_upper,2)+ math.pow(pylabel_lower-tylabel_lower,2)
 	acc = min(accx, accy)
 	return(acc)
 
@@ -59,8 +57,5 @@ def compute_accuracy_dataset(maxlabels, imdb, W_48):
 		accy = 1- margin*(math.pow(pylabel_upper-tylabel_upper,2)+ math.pow(pylabel_lower-tylabel_lower,2))
 		accx = max(accx, 0.0)
 		accy = max(accy, 0.0)
-	
-		#errorx = math.pow(pxlabel_left-txlabel_left,2)+ math.pow(pxlabel_right-txlabel_right,2)
-		#errory = math.pow(pylabel_upper-tylabel_upper,2)+ math.pow(pylabel_lower-tylabel_lower,2)
 		acc.append(min(accx, accy))
 	return(acc)
