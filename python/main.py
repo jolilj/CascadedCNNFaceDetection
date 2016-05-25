@@ -77,7 +77,7 @@ model48.load_weights(model48FileName)
 start_time = time.time()
 #=== Predict
 predictions_24 = model24.predict(X, batch_size=16, verbose=1)
-print("24Net detection in {0} s".format(time.time() - start_time))
+print("\n24Net detection in {0} s".format(time.time() - start_time))
 #====
 predictions_high = []
 previmageidx = W[0][0][3]
@@ -89,11 +89,7 @@ W_high = []
 
 for i in range(0, predictions_24.shape[0]):
     imageidx = W[i][0][3]
-    if(imageidx == previmageidx):
-        pred_per_image.append(predictions_24[i, :])
-        X_per_image.append(X[i, :, :, :])
-        W_per_image.append(W[i, :, :])
-    else:
+    if ( (i == predictions_24.shape[0]-1) or (imageidx != previmageidx) ):
         nb_top_targets = int(math.ceil(len(pred_per_image)*0.1))
         high_idx = np.argsort(np.squeeze(pred_per_image))[-nb_top_targets:]
         for index in high_idx:
@@ -103,8 +99,11 @@ for i in range(0, predictions_24.shape[0]):
         X_per_image = []
         W_per_image = []
         pred_per_image = []
+    else:
+        pred_per_image.append(predictions_24[i, :])
+        X_per_image.append(X[i, :, :, :])
+        W_per_image.append(W[i, :, :])
     previmageidx = imageidx
-
 X_high = np.asarray(X_high)
 W_high = np.asarray(W_high)
 predictions_high = np.asarray(predictions_high)
@@ -122,7 +121,7 @@ start_time = time.time()
 [X_48, Y_48, W_48, windowSize, imdb_48] = net.preProcess48Net(imdb, X_high, predictions_high, W_high, windowSize)
 print("preprocessing in {0}".format(time.time()-start_time))
 predictions_48 = model48.predict_on_batch(X_48)
-print("48 detecion in {0} s".format(time.time()-start_time))
+print("\n48Net detecion in {0} s".format(time.time()-start_time))
 #================================================
 # Evaluation
 #================================================

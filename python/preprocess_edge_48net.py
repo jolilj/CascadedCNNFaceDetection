@@ -9,7 +9,7 @@ newWindowSize = 48
 zoomFactor = 5
 pyramidLevels = 3
 
-def preProcess48Net(imdb, X,Y,W, prevWindowSize, T=0):
+def preProcess48Net(imdb, X,Y,W, prevWindowSize, T=-1000000000):
     scaleFactor = math.pow(prevWindowSize*zoomFactor*1.0/newWindowSize,1.0/(pyramidLevels-1))
     #Get all indices where the output is higher than the threshold
     idx = np.squeeze(Y>T)
