@@ -9,6 +9,7 @@ import slidingwindow as sw
 import numpy as np
 import cv2
 import time
+import random
 import model_architecture
 import os
 import sys
@@ -39,6 +40,9 @@ else:
     print("======Loading and Preprocessing...======")
     start_time = time.time()
     imdb = il.loadAndPreProcessIms('annotations_train.txt', scaleFactor, (prevWindowSize,prevWindowSize))
+    imdb2 = il.loadAndPreProcessNegative('images/sun2',300,2, (prevWindowSize*4, prevWindowSize*4))
+    imdb = imdb + imdb2
+    random.shuffle(imdb)
     
     [X, Y, W] = il.getCNNFormat(imdb, stepSize, prevWindowSize)
     np.save('data/data_X',X)

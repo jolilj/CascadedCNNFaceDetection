@@ -9,7 +9,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-import preprocess_48net as net
+import preprocess_edge_48net as net
 import visualize_results as vr
 
 model12FileName = str(sys.argv[1])
