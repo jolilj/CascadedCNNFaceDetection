@@ -50,5 +50,4 @@ def visualizeResultNoSubImage(title, pImages, pWindows):
         cv2.rectangle(pImage, predicted_rect[0], predicted_rect[1], [0, 0, 0],1 )
         plt.figure(title)
         plt.imshow(pImage,cmap=plt.cm.gray)
-        plt.show()
-
+        plt.show() 

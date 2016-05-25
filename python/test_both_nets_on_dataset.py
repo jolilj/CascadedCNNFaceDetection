@@ -9,7 +9,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-import preprocess_48net as net
+import preprocess_edge_48net as net
 import visualize_results as vr
 import compute_accuracy as acc
 
@@ -174,8 +174,8 @@ prec = float(tracked)/float(len(acc))
 
 print(prec)
 
-#title = "Top predicted face image from 48Net"
-#vr.visualizeResultNoSubImage(title,images, windows)
+title = "Top predicted face image from 48Net"
+vr.visualizeResultNoSubImage(title,images, windows)
 
 
 
