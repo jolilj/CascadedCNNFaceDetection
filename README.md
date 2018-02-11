@@ -8,4 +8,4 @@ A simple cascaded convolutional neural network for single face detection impleme
 To run the code you need Python 2 and [Keras](https://keras.io) installed and a dataset. We used [FDDB](http://vis-www.cs.umass.edu/fddb/).
 
 ## Usage
-Code entry point is main.py. Read project_report.pdf for a thorough review of the method.
+Code entry point is [main.py](https://github.com/jolilj/CascadedCNNFaceDetection/blob/master/python/main.py). Read project_report.pdf for a thorough review of the method.
